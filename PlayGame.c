@@ -45,15 +45,9 @@ bool isSnake() {
 /*
 * Check if it's a ladder
 */
-
 bool isLadder() {
 
 }
-
-
-
-
-
 
 
 int main (int argc, char** argv) {
