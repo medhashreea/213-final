@@ -25,3 +25,7 @@ Acknowledgements:
         https://www.deusinmachina.net/p/sdl-tutorial-part-1-opening-a-window
 
         https://www.youtube.com/watch?v=lv1MoRYJZcU&list=PLHJE4y54mpC5_eEz9gCqIkNpU-n_2eyNt&index=12
+        
+        https://www.youtube.com/watch?v=zlKdOIQCnxA
+
+        ChatGPT
