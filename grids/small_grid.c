@@ -1,11 +1,16 @@
+#include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <stdio.h>
+#include <SDL2/SDL_image.h>
 
 #define SCREEN_WIDTH 720
 #define SCREEN_HEIGHT 950
 #define CELL_WIDTH 50  // Width of each cell
 #define CELL_HEIGHT 50 // Height of each cell
+
+// void addIMG(SDL_Renderer *renderer) {
+
+// }
 
 void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
 {
@@ -116,10 +121,15 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
                 SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
                 SDL_FreeSurface(textSurface);
                 SDL_DestroyTexture(textTexture);
-            }
-        }
-    }
-}
+            } // column loop
+        } // cond check for odd/even rows
+    } // row loop
+
+    IMG_Init(IMG_INIT_PNG); // initialize support for pngs
+    SDL_Surface *ladder = IMG_Load("images/ladder.png");
+    SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
+    IMG_Quit();
+} // drawGrid
 
 int main(int argc, char *argv[])
 {

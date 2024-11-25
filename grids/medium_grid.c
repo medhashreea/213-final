@@ -116,10 +116,10 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
                 SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
                 SDL_FreeSurface(textSurface);
                 SDL_DestroyTexture(textTexture);
-            }
-        }
-    }
-}
+            } // column loop
+        } // cond check for odd/even rows
+    } // row loop
+} // drawGrid
 
 int main(int argc, char *argv[])
 {
