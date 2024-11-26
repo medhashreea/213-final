@@ -2,18 +2,41 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <FL/math.h>
 
 #define SCREEN_WIDTH 720
 #define SCREEN_HEIGHT 950
 #define CELL_WIDTH 50  // Width of each cell
-#define CELL_HEIGHT 50 // Height of each cell
+#define CELL_HEIGHT 35 // Height of each cell
 
-// void addIMG(SDL_Renderer *renderer) {
+// Function to draw a diagonal ladder between two points 
+void drawDiagonalLadder(SDL_Renderer * renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y) {
+    // Calculate the start position in pixels (bottom of startRow, startCol)
+    int startX = screen_x + startCol * CELL_WIDTH + CELL_WIDTH/2;
+    int startY = screen_y + startRow * CELL_HEIGHT + CELL_HEIGHT/2; 
 
-// }
+    // Calculate the end position in pixels (top of endRow, endCol)
+    int endX = screen_x + endCol * CELL_WIDTH + CELL_WIDTH / 2;
+    int endY = screen_y + endRow * CELL_HEIGHT + CELL_HEIGHT / 2;
 
-void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
-{
+    // Calculate the width (distance btw columns) and height (distance between columns)
+    int ladderWidth = abs(endX - startX);
+    int ladderHeight = abs(endY - startY);
+
+    // Calculate the angle of rotation (in radians) using the arctangent of slope
+    double angle = atan2(endY - startY, endX - startX) * 180 / M_PI;
+
+    // Create the rectangle for the ladder image
+    SDL_Rect ladderRect = { startX, startY, ladderWidth, ladderHeight};
+
+    // Render the ladder texture, rotated to match diagonal 
+    // SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
+   SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
+
+}
+
+
+void drawGrid(SDL_Renderer *renderer, TTF_Font *font) {
     int margin = 25; // margin size
     int rows = 25;
     int cols = 5;
@@ -34,42 +57,35 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
     // Set the color for the grid lines (R, G, B, A)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color
 
-    for (int x = screen_x; x <= screen_x + width; x += CELL_WIDTH)
-    {
+    for (int x = screen_x; x <= screen_x + width; x += CELL_WIDTH) {
         SDL_RenderDrawLine(renderer, x, screen_y, x, screen_y + height);
     } // vertical lines on board
 
-    for (int y = screen_y; y <= screen_y + height; y += CELL_HEIGHT)
-    {
+    for (int y = screen_y; y <= screen_y + height; y += CELL_HEIGHT) {
         SDL_RenderDrawLine(renderer, screen_x, y, screen_x + width, y);
     } // horizontal lines on board
 
     // add values in boxes
     SDL_Color color = {255, 255, 255, 255};
-    int number = -19;
+    int number = 1;
     char numStr[10];
 
-    for (int row = rows; (row <= rows) && (row >= 0); row--)
-    {
-        if ((row % 2) != 0)
-        {
-            for (int col = 0; col < cols; col++)
-            {
+    for (int row = rows - 1; (row <= rows) && (row >= 0); row--) {
+        if ((row % 2) == 0) {
+            for (int col = 0; col < cols; col++) {
                 // check if row is even or odd
                 // char numStr[10];
                 snprintf(numStr, sizeof(numStr), "%d", number++);
 
                 // Create text surface and texture
                 SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
-                if (!textSurface)
-                {
+                if (!textSurface) {
                     printf("Failed to render text: %s\n", TTF_GetError());
                     continue;
                 }
 
                 SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                if (!textTexture)
-                {
+                if (!textTexture) {
                     printf("Failed to create texture: %s\n", SDL_GetError());
                     SDL_FreeSurface(textSurface);
                     continue;
@@ -86,25 +102,20 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
                 SDL_FreeSurface(textSurface);
                 SDL_DestroyTexture(textTexture);
             }
-        }
-        else
-        {
-            for (int col = cols - 1; (col <= cols) && (col >= 0); col--)
-            {
+        } else {
+            for (int col = cols - 1; (col <= cols) && (col >= 0); col--) {
                 // char numStr[10];
                 snprintf(numStr, sizeof(numStr), "%d", number++);
 
                 // Create text surface and texture
                 SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
-                if (!textSurface)
-                {
+                if (!textSurface) {
                     printf("Failed to render text: %s\n", TTF_GetError());
                     continue;
                 }
 
                 SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-                if (!textTexture)
-                {
+                if (!textTexture) {
                     printf("Failed to create texture: %s\n", SDL_GetError());
                     SDL_FreeSurface(textSurface);
                     continue;
@@ -125,10 +136,34 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font)
         } // cond check for odd/even rows
     } // row loop
 
-    IMG_Init(IMG_INIT_PNG); // initialize support for pngs
-    SDL_Surface *ladder = IMG_Load("images/ladder.png");
+    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+    SDL_Surface *ladder = IMG_Load("images/ladder.png"); // Load your PNG image
+    if (ladder == NULL) // failure check
+    { 
+        printf("Failed to load ladder image: %s\n", IMG_GetError());
+        return;
+    }
+
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
-    IMG_Quit();
+    SDL_FreeSurface(ladder); // Free the surface after creating texture
+
+    if (ladder_texture == NULL) // failure check
+    {
+        printf("Failed to create ladder texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    // Choose the row and column where you want to place the ladder image (e.g., row 2, column 3)
+      int startRow = 18; 
+      int endRow = 10;
+
+      int startCol = 1;
+      int endCol = 3;
+
+    drawDiagonalLadder(renderer, ladder_texture, startRow, startCol, endRow, endCol, screen_x, screen_y);
+    // Free the image texture after rendering
+    SDL_DestroyTexture(ladder_texture);
+    
 } // drawGrid
 
 int main(int argc, char *argv[])
@@ -168,7 +203,7 @@ int main(int argc, char *argv[])
     }
 
     // Load font
-    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
 
     if (font == NULL)
     {
