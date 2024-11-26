@@ -23,6 +23,13 @@ void drawDiagonalLadder(SDL_Renderer * renderer, SDL_Texture *ladder_texture, in
     int ladderWidth = abs(endX - startX);
     int ladderHeight = abs(endY - startY);
 
+    // this is calculating actual ladder, want to calculate image
+    // 4 new scaling variables 
+    // if ladder 1/3 of it scale of 
+    // have a scale width, scale height variable 
+    // could have a different image for each one and then just place the image on the board, might be more hard coded
+
+
     // Calculate the angle of rotation (in radians) using the arctangent of slope
     double angle = atan2(endY - startY, endX - startX) * 180 / M_PI;
 
@@ -154,8 +161,8 @@ void drawGrid(SDL_Renderer *renderer, TTF_Font *font) {
     }
 
     // Choose the row and column where you want to place the ladder image (e.g., row 2, column 3)
-      int startRow = 18; 
-      int endRow = 10;
+      int startRow = 3; 
+      int endRow = 6;
 
       int startCol = 1;
       int endCol = 3;
