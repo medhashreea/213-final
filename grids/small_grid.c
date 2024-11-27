@@ -12,7 +12,7 @@
 /**
  * Function to draw a diagonal ladder between two points
  */
-void draw_diagonal_ladder(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
+void draw_img (SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
 {
     // Calculate the start position in pixels (bottom of startRow, startCol)
     int startX = screen_x + startCol * CELL_WIDTH + CELL_WIDTH;
@@ -46,29 +46,73 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 
     // Init all ladders (SDL_Surface)
     SDL_Surface *ladder = IMG_Load("images/ladder.png"); // Load your PNG image
-    if (ladder == NULL)                                  // failure check
+    SDL_Surface *ladder2 = IMG_Load("images/ladder2.png"); // Load your PNG image
+    SDL_Surface *ladder3 = IMG_Load("images/ladder3.png"); // Load your PNG image
+
+    SDL_Surface *snake = IMG_Load("images/snake1.png"); // Load your PNG image
+    SDL_Surface *snake2 = IMG_Load("images/snake4.png"); // Load your PNG image
+    SDL_Surface *snake3 = IMG_Load("images/snake3.png"); // Load your PNG image
+
+    if (ladder == NULL || ladder2 == NULL || ladder3 == NULL)                                  // failure check
     {
         printf("Failed to load ladder image: %s\n", IMG_GetError());
         return;
     }
 
+    if (snake == NULL || snake2 == NULL || snake3 == NULL) 
+    {
+        printf("Failed to load snake image: %s\n", IMG_GetError());
+        return;
+    }
+
+
     // Init all ladders (SDL_Texture)
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
+    SDL_Texture *ladder_texture2 = SDL_CreateTextureFromSurface(renderer, ladder2);
+    SDL_Texture *ladder_texture3 = SDL_CreateTextureFromSurface(renderer, ladder3);
+
+
+    // Init all snakes (SDL_Texture)
+    SDL_Texture *snake_texture = SDL_CreateTextureFromSurface(renderer, snake);
+    SDL_Texture *snake_texture2 = SDL_CreateTextureFromSurface(renderer, snake2);
+    SDL_Texture *snake_texture3 = SDL_CreateTextureFromSurface(renderer, snake3);
+
+
 
     // Free all ladder Surface
     SDL_FreeSurface(ladder); // Free the surface after creating texture
+    SDL_FreeSurface(ladder2);
+    SDL_FreeSurface(ladder3);
 
-    if (ladder_texture == NULL) // failure check
+    // Free all the snakes 
+    SDL_FreeSurface(snake);
+    SDL_FreeSurface(snake2);
+    SDL_FreeSurface(snake3);
+
+    if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL) // failure check
     {
         printf("Failed to create ladder texture: %s\n", SDL_GetError());
         return;
     }
 
     // place ladder
-    draw_diagonal_ladder(renderer, ladder_texture, 3, 1, 5, 3, screen_x, screen_y, 1, 1, 90);
+    draw_img(renderer, ladder_texture, 3, 1, 5, 3, screen_x, screen_y, 1, 1, 90);
+    draw_img(renderer, ladder_texture2, 18, 2, 20, 4, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture3, 10, 1, 12, 3, screen_x, screen_y, 1, 1, 270);
+
+    // place snakes
+    draw_img(renderer, snake_texture, 15, 0, 13, 2, screen_x, screen_y, 1, 1, 270);
+    draw_img(renderer, snake_texture2, 6, 2, 8, 4, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, snake_texture3, 8, 10, 12, 10, screen_x, screen_y, 1, 1, 90);
+
 
     // Free the image texture after rendering
     SDL_DestroyTexture(ladder_texture);
+    SDL_DestroyTexture(ladder_texture2);
+    SDL_DestroyTexture(ladder_texture3);
+    SDL_DestroyTexture(snake_texture);
+    SDL_DestroyTexture(snake_texture2);
+    SDL_DestroyTexture(snake_texture3);
 }
 
 /**
@@ -90,7 +134,7 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
 
     // render board
     SDL_Rect board = {screen_x, screen_y, width, height}; // x, y, width, height
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);     // Set color to red
+    SDL_SetRenderDrawColor(renderer, 214, 151, 213, 1);     // Set color to pinnk
     SDL_RenderFillRect(renderer, &board);                 // Fill the rectangle
 
     // Set the color for the grid lines (R, G, B, A)
