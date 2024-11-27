@@ -13,6 +13,7 @@ Description:
     
     This is a game of Snakes & Ladders.
 
+// Compile: clang -o small_grid small_grid.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
 
 Acknowledgements:
     
