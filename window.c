@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <FL/math.h>
 
 // Macros
 #define SCREEN_WIDTH   1280
@@ -25,34 +27,104 @@
  * IF FINISH EARLY
  * 1. add networking >_<
  */
+void intro_screen(renderer, font) {
+        // calculate board position
+    int screen_x = SCREEN_WIDTH / 2;   // Center horizontally
+    int screen_y = SCREEN_HEIGHT / 2; // Center vertically
+
+    // render board
+    SDL_Rect board = {screen_x, screen_y, SCREEN_WIDTH, SCREEN_HEIGHT}; // x, y, width, height
+    SDL_SetRenderDrawColor(renderer, 214, 151, 213, 1);     // Set color to pinnk
+    SDL_RenderFillRect(renderer, &board);                 // Fill the rectangle
+
+    // Set the color for the grid lines (R, G, B, A)
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color
+
+    
+    
+}
+
 
 int main(int argc, char ** argv) {
-    bool quit = false; // quit status
-    SDL_Event event;
+        // Initialize SDL
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+        return -1;
+    }
 
-    SDL_Init(SDL_INIT_VIDEO);
+    // Initialize SDL_ttf
+    if (TTF_Init() == -1)
+    {
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        SDL_Quit();
+        return -1;
+    }
 
-    SDL_Window * window = SDL_CreateWindow("Snakes and Ladders",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0); // create window of wxh
-    
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0); // renders window
+    // Create window
+    SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (window == NULL)
+    {
+        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        return -1;
+    }
 
+    // Create renderer
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == NULL)
+    {
+        printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
+    }
 
-    while (!quit) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 250); // window color
-        SDL_RenderClear(renderer); // makes white
-        SDL_RenderPresent(renderer); // makes it appear
-        SDL_WaitEvent(&event);
+    // Load font
+    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
 
-        switch (event.type)
+    if (font == NULL)
+    {
+        printf("Failed to load font: %s\n", TTF_GetError());
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return -1;
+    }
+
+    // Main loop flag
+    int quit = 0;
+    SDL_Event e;
+
+    while (!quit)
+    {
+        // Handle events
+        while (SDL_PollEvent(&e) != 0)
         {
-        case SDL_QUIT:
-            quit = true;
-            break;
+            if (e.type == SDL_QUIT)
+            {
+                quit = 1;
+            }
         }
-    } // while not quit
 
+        // Clear screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+        SDL_RenderClear(renderer);
+
+        // Opening window
+        intro_screen(renderer, font);
+
+        // Update the screen
+        SDL_RenderPresent(renderer);
+    }
+
+    // Clean up and quit SDL
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    // SDL_DestroyTexture(currentImage);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;

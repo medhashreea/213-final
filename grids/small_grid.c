@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
@@ -9,10 +10,50 @@
 #define CELL_WIDTH 50     // Width of each cell
 #define CELL_HEIGHT 35    // Height of each cell
 
+char *dice_paths[] = {"grids/images/one.png", "grids/images/two.png", "grids/images/three.png", "grids/images/four.png", "grids/images/five.png", "grids/images/six.png"};
+
+void draw_dice(SDL_Renderer *renderer)
+{
+
+    // Create the rectangle for the dice image
+    SDL_Rect dice_rect = {25, 25, 175, 175};
+    // SDL_SetRenderDrawColor(renderer, 154, 248, 0, 1); // Set color to not pink
+    // SDL_RenderFillRect(renderer, &dice_rect); // Fill the rectangle
+    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+
+    int dice_value = rand() % 6;
+    char *dice_choice = dice_paths[dice_value];
+
+    // init dice
+    SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
+
+    // failure check
+    if (dice == NULL)
+    {
+        printf("Failed to load dice: %s\n", IMG_GetError());
+        return;
+    }
+
+    // Init dice
+    SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
+
+    SDL_FreeSurface(dice); // Free the surface after creating texture
+
+    if (dice_texture == NULL) // failure check
+    {
+        printf("Failed to create dice texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_RenderCopy(renderer, dice_texture, NULL, &dice_rect);
+
+    // SDL_DestroyTexture(dice_texture);
+}
+
 /**
  * Function to draw a diagonal ladder between two points
  */
-void draw_img (SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
+void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
 {
     // Calculate the start position in pixels (bottom of startRow, startCol)
     int startX = screen_x + startCol * CELL_WIDTH + CELL_WIDTH;
@@ -43,57 +84,89 @@ void draw_img (SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow
 void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+    char *dice_choice = "";
+
+    int dice_value = rand() % 6;
+    dice_choice = dice_paths[dice_value];
+
+    // // // init dice
+    // char* dice_chose = roll_dice(renderer);
+    // SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
 
     // Init all ladders (SDL_Surface)
-    SDL_Surface *ladder = IMG_Load("images/ladder.png"); // Load your PNG image
-    SDL_Surface *ladder2 = IMG_Load("images/ladder2.png"); // Load your PNG image
-    SDL_Surface *ladder3 = IMG_Load("images/ladder3.png"); // Load your PNG image
+    SDL_Surface *ladder = IMG_Load("grids/images/ladder.png");   // Load your PNG image
+    SDL_Surface *ladder2 = IMG_Load("grids/images/ladder2.png"); // Load your PNG image
+    SDL_Surface *ladder3 = IMG_Load("grids/images/ladder3.png"); // Load your PNG image
 
-    SDL_Surface *snake = IMG_Load("images/snake1.png"); // Load your PNG image
-    SDL_Surface *snake2 = IMG_Load("images/snake4.png"); // Load your PNG image
-    SDL_Surface *snake3 = IMG_Load("images/snake3.png"); // Load your PNG image
+    SDL_Surface *snake = IMG_Load("grids/images/snake1.png");  // Load your PNG image
+    SDL_Surface *snake2 = IMG_Load("grids/images/snake4.png"); // Load your PNG image
+    SDL_Surface *snake3 = IMG_Load("grids/images/snake8.png"); // Load your PNG image
 
-    if (ladder == NULL || ladder2 == NULL || ladder3 == NULL)                                  // failure check
+    // // // failure check
+    // if (dice == NULL)
+    // {
+    //     printf("Failed to load dice: %s\n", IMG_GetError());
+    //     return;
+    // }
+
+    if (ladder == NULL || ladder2 == NULL || ladder3 == NULL)
     {
         printf("Failed to load ladder image: %s\n", IMG_GetError());
         return;
     }
 
-    if (snake == NULL || snake2 == NULL || snake3 == NULL) 
+    if (snake == NULL || snake2 == NULL || snake3 == NULL)
     {
         printf("Failed to load snake image: %s\n", IMG_GetError());
         return;
     }
 
+    // // // Init all dice
+    // SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
 
     // Init all ladders (SDL_Texture)
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
     SDL_Texture *ladder_texture2 = SDL_CreateTextureFromSurface(renderer, ladder2);
     SDL_Texture *ladder_texture3 = SDL_CreateTextureFromSurface(renderer, ladder3);
 
-
     // Init all snakes (SDL_Texture)
     SDL_Texture *snake_texture = SDL_CreateTextureFromSurface(renderer, snake);
     SDL_Texture *snake_texture2 = SDL_CreateTextureFromSurface(renderer, snake2);
     SDL_Texture *snake_texture3 = SDL_CreateTextureFromSurface(renderer, snake3);
 
-
+    // // Free all ladder Surface
+    // SDL_FreeSurface(dice); // Free the surface after creating texture
 
     // Free all ladder Surface
     SDL_FreeSurface(ladder); // Free the surface after creating texture
     SDL_FreeSurface(ladder2);
     SDL_FreeSurface(ladder3);
 
-    // Free all the snakes 
+    // Free all the snakes
     SDL_FreeSurface(snake);
     SDL_FreeSurface(snake2);
     SDL_FreeSurface(snake3);
+
+    // if (dice_texture == NULL) // failure check
+    // {
+    //     printf("Failed to create dice texture: %s\n", SDL_GetError());
+    //     return;
+    // }
 
     if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL) // failure check
     {
         printf("Failed to create ladder texture: %s\n", SDL_GetError());
         return;
     }
+
+    if (snake_texture == NULL || snake_texture2 == NULL || snake_texture3 == NULL) // failure check
+    {
+        printf("Failed to create snake texture: %s\n", SDL_GetError());
+        return;
+    }
+
+    // // place dice
+    // draw_img(renderer, dice_texture, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
 
     // place ladder
     draw_img(renderer, ladder_texture, 3, 1, 5, 3, screen_x, screen_y, 1, 1, 90);
@@ -102,11 +175,11 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 
     // place snakes
     draw_img(renderer, snake_texture, 15, 0, 13, 2, screen_x, screen_y, 1, 1, 270);
-    draw_img(renderer, snake_texture2, 6, 2, 8, 4, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, snake_texture3, 8, 10, 12, 10, screen_x, screen_y, 1, 1, 90);
-
+    draw_img(renderer, snake_texture2, 18, -1, 23, 2, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, snake_texture3, 1, -1, 6, 2, screen_x, screen_y, 1, 1, 90);
 
     // Free the image texture after rendering
+    // SDL_DestroyTexture(dice_texture);
     SDL_DestroyTexture(ladder_texture);
     SDL_DestroyTexture(ladder_texture2);
     SDL_DestroyTexture(ladder_texture3);
@@ -134,7 +207,7 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
 
     // render board
     SDL_Rect board = {screen_x, screen_y, width, height}; // x, y, width, height
-    SDL_SetRenderDrawColor(renderer, 214, 151, 213, 1);     // Set color to pinnk
+    SDL_SetRenderDrawColor(renderer, 214, 151, 213, 1);   // Set color to pinnk
     SDL_RenderFillRect(renderer, &board);                 // Fill the rectangle
 
     // Set the color for the grid lines (R, G, B, A)
@@ -295,6 +368,10 @@ int main(int argc, char *argv[])
             {
                 quit = 1;
             }
+            // else if (e.type == SDL_KEYDOWN)
+            // {
+            //     draw_dice(renderer);
+            // }
         }
 
         // Clear screen
@@ -303,6 +380,7 @@ int main(int argc, char *argv[])
 
         // Draw the grid
         draw_grid(renderer, font);
+        draw_dice(renderer);
 
         // Update the screen
         SDL_RenderPresent(renderer);
