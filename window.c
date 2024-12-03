@@ -5,9 +5,8 @@
 #include <FL/math.h>
 
 // Macros
-#define SCREEN_WIDTH   1280
-#define SCREEN_HEIGHT  720
-
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 /**
  * GRAPHICS TODO (25x5, 50x10, 100x50) - each grid is different file
@@ -17,43 +16,45 @@
  * 4. add the players (threading - thread for each player, thread synch moves)
  * 5. generate dice (1-6)
  * 6. move players around based dice value (scheduling)
- * 
+ *
  * AFTER basic graphics
  * 1. create opening window/screen choices (grid choice & # of player choice)
  * 2. based on selection, change window/screen to respective grid with respective number of players
  * 3. play game
  * 4. closing rank window/screen
- * 
+ *
  * IF FINISH EARLY
  * 1. add networking >_<
  */
-void intro_screen(renderer, font) {
-        // calculate board position
-    int screen_x = SCREEN_WIDTH / 2;   // Center horizontally
-    int screen_y = SCREEN_HEIGHT / 2; // Center vertically
+void intro_screen(SDL_Renderer *renderer)
+{
+    int margin = 25; // margin size
+    int rect_width = SCREEN_WIDTH - 2 * margin;  // Adjust width considering the margin
+    int rect_height = SCREEN_HEIGHT - 2 * margin; // Adjust height considering the margin
+
+    // Calculate the position to center the rectangle
+    int screen_x = (SCREEN_WIDTH - rect_width) / 2;
+    int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
 
     // render board
-    SDL_Rect board = {screen_x, screen_y, SCREEN_WIDTH, SCREEN_HEIGHT}; // x, y, width, height
-    SDL_SetRenderDrawColor(renderer, 214, 151, 213, 1);     // Set color to pinnk
-    SDL_RenderFillRect(renderer, &board);                 // Fill the rectangle
+    SDL_Rect board = {screen_x, screen_y, rect_width, rect_height}; // x, y, width, height
+    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1);                 // Set color to pinnk
+    SDL_RenderFillRect(renderer, &board);                               // Fill the rectangle
 
     // Set the color for the grid lines (R, G, B, A)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color
-
-    
-    
 }
 
-
-int main(int argc, char ** argv) {
-        // Initialize SDL
+int main(int argc, char **argv)
+{
+    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return -1;
     }
 
-    // Initialize SDL_ttf
+    // Initialize SDL_ttf (font)
     if (TTF_Init() == -1)
     {
         printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
@@ -113,7 +114,7 @@ int main(int argc, char ** argv) {
         SDL_RenderClear(renderer);
 
         // Opening window
-        intro_screen(renderer, font);
+        intro_screen(renderer); // create backdrop
 
         // Update the screen
         SDL_RenderPresent(renderer);
@@ -123,7 +124,6 @@ int main(int argc, char ** argv) {
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    // SDL_DestroyTexture(currentImage);
     TTF_Quit();
     SDL_Quit();
 
