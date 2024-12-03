@@ -1,54 +1,15 @@
 #include <stdio.h>
-#include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
 
+#include "../helpers/dice.c"
+
 #define SCREEN_WIDTH 720  // Width of screen
 #define SCREEN_HEIGHT 950 // Height of screen
 #define CELL_WIDTH 50     // Width of each cell
 #define CELL_HEIGHT 35    // Height of each cell
-
-char *dice_paths[] = {"grids/images/one.png", "grids/images/two.png", "grids/images/three.png", "grids/images/four.png", "grids/images/five.png", "grids/images/six.png"};
-
-void draw_dice(SDL_Renderer *renderer)
-{
-
-    // Create the rectangle for the dice image
-    SDL_Rect dice_rect = {25, 25, 175, 175};
-    // SDL_SetRenderDrawColor(renderer, 154, 248, 0, 1); // Set color to not pink
-    // SDL_RenderFillRect(renderer, &dice_rect); // Fill the rectangle
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-
-    int dice_value = rand() % 6;
-    char *dice_choice = dice_paths[dice_value];
-
-    // init dice
-    SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
-
-    // failure check
-    if (dice == NULL)
-    {
-        printf("Failed to load dice: %s\n", IMG_GetError());
-        return;
-    }
-
-    // Init dice
-    SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
-
-    SDL_FreeSurface(dice); // Free the surface after creating texture
-
-    if (dice_texture == NULL) // failure check
-    {
-        printf("Failed to create dice texture: %s\n", SDL_GetError());
-        return;
-    }
-
-    SDL_RenderCopy(renderer, dice_texture, NULL, &dice_rect);
-
-    // SDL_DestroyTexture(dice_texture);
-}
 
 /**
  * Function to draw a diagonal ladder between two points
@@ -359,6 +320,9 @@ int main(int argc, char *argv[])
     int quit = 0;
     SDL_Event e;
 
+    // Variable to hold the current dice texture
+    SDL_Texture *dice_texture = NULL;
+
     while (!quit)
     {
         // Handle events
@@ -368,10 +332,33 @@ int main(int argc, char *argv[])
             {
                 quit = 1;
             }
-            // else if (e.type == SDL_KEYDOWN)
-            // {
-            //     draw_dice(renderer);
-            // }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                // Check if left mouse button was clicked
+                if (e.button.button == SDL_BUTTON_LEFT)
+                {
+                    // Generate a random dice value and choose the corresponding texture
+                    int dice_value = rand() % 6;
+                    char *dice_choice = dice_paths[dice_value];
+
+                    // Load the new dice texture
+                    SDL_Surface *dice_surface = IMG_Load(dice_choice);
+                    if (dice_surface == NULL)
+                    {
+                        printf("Failed to load dice image: %s\n", IMG_GetError());
+                    }
+                    else
+                    {
+                        // Create the texture from the loaded surface
+                        if (dice_texture != NULL)
+                        {
+                            SDL_DestroyTexture(dice_texture); // Clean up the previous texture
+                        }
+                        dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
+                        SDL_FreeSurface(dice_surface); // Free the surface after creating texture
+                    }
+                }
+            }
         }
 
         // Clear screen
@@ -380,13 +367,18 @@ int main(int argc, char *argv[])
 
         // Draw the grid
         draw_grid(renderer, font);
-        draw_dice(renderer);
+        draw_dice(renderer, dice_texture);
 
         // Update the screen
         SDL_RenderPresent(renderer);
     }
 
     // Clean up and quit SDL
+    // Clean up and quit SDL
+    if (dice_texture != NULL)
+    {
+        SDL_DestroyTexture(dice_texture); // Free the texture when quitting
+    }
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
