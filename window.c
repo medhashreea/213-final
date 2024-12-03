@@ -26,23 +26,41 @@
  * IF FINISH EARLY
  * 1. add networking >_<
  */
-void intro_screen(SDL_Renderer *renderer)
+void intro_screen(SDL_Renderer *renderer, TTF_Font *font)
 {
-    int margin = 25; // margin size
-    int rect_width = SCREEN_WIDTH - 2 * margin;  // Adjust width considering the margin
-    int rect_height = SCREEN_HEIGHT - 2 * margin; // Adjust height considering the margin
+    // MAIN BACKDROP
+    int margin = 25;                              // margin size
+    int rect_width = SCREEN_WIDTH - margin;   // Adjust width considering the margin
+    int rect_height = SCREEN_HEIGHT - margin; // Adjust height considering the margin
 
     // Calculate the position to center the rectangle
     int screen_x = (SCREEN_WIDTH - rect_width) / 2;
     int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
 
-    // render board
-    SDL_Rect board = {screen_x, screen_y, rect_width, rect_height}; // x, y, width, height
-    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1);                 // Set color to pinnk
-    SDL_RenderFillRect(renderer, &board);                               // Fill the rectangle
+    // main backdrop render
+    SDL_Rect board = {screen_x, screen_y, rect_width, rect_height};
+    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1); // color
+    SDL_RenderFillRect(renderer, &board);               // fill
 
-    // Set the color for the grid lines (R, G, B, A)
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color
+    // SUB-BACKDROPS - GRID CHOICE BOXES
+    int grid_pick_width = rect_width / 3;
+    int grid_pick_height = rect_height / 5;
+    int grid_pick_y = screen_y * 20;
+
+    // small grid choice box placement
+    SDL_Rect sm_grid = {screen_x * 3, grid_pick_y, grid_pick_width, grid_pick_height};
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 1); // color
+    SDL_RenderFillRect(renderer, &sm_grid);       // fill
+    
+    // // medium grid choice box placement
+    // SDL_Rect md_grid = {screen_x/2, grid_pick_y, grid_pick_width, grid_pick_height};
+    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 1); // color
+    // SDL_RenderFillRect(renderer, &md_grid);       // fill
+    
+    // // large grid choice box placement
+    // SDL_Rect lg_grid = {screen_x * 35, grid_pick_y, grid_pick_width, grid_pick_height};
+    // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1); // color
+    // SDL_RenderFillRect(renderer, &lg_grid);       // fill
 }
 
 int main(int argc, char **argv)
@@ -114,7 +132,7 @@ int main(int argc, char **argv)
         SDL_RenderClear(renderer);
 
         // Opening window
-        intro_screen(renderer); // create backdrop
+        intro_screen(renderer, font); // create backdrop
 
         // Update the screen
         SDL_RenderPresent(renderer);
