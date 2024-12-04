@@ -156,10 +156,11 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y) {
     SDL_DestroyTexture(ladder_texture);
     SDL_DestroyTexture(ladder_texture2);
     SDL_DestroyTexture(ladder_texture3);
+    SDL_DestroyTexture(ladder_texture4);
     SDL_DestroyTexture(snake_texture);
     SDL_DestroyTexture(snake_texture2);
     SDL_DestroyTexture(snake_texture3);
-
+    SDL_DestroyTexture(snake_texture4);
 }
 
 /*
