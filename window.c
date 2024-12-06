@@ -4,10 +4,17 @@
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
 
+#include "grids/small_grid.c"
+
 // Macros
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
+typedef struct
+{
+    SDL_Rect rect;   // Position and size of the button
+    SDL_Color color; // Color of the button
+} Button;
 /**
  * GRAPHICS TODO (25x5, 50x10, 100x50) - each grid is different file
  * 1. build grid
@@ -26,42 +33,59 @@
  * IF FINISH EARLY
  * 1. add networking >_<
  */
-void intro_screen(SDL_Renderer *renderer, TTF_Font *font)
-{
-    // MAIN BACKDROP
-    int margin = 25;                              // margin size
-    int rect_width = SCREEN_WIDTH - margin;   // Adjust width considering the margin
-    int rect_height = SCREEN_HEIGHT - margin; // Adjust height considering the margin
+// void intro_screen(SDL_Renderer *renderer, TTF_Font *font)
+// {
+//     // MAIN BACKDROP
+//     int margin = 25;                              // margin size
+//     int rect_width = SCREEN_WIDTH - margin;   // Adjust width considering the margin
+//     int rect_height = SCREEN_HEIGHT - margin; // Adjust height considering the margin
 
-    // Calculate the position to center the rectangle
+//     // Calculate the position to center the rectangle
+//     int screen_x = (SCREEN_WIDTH - rect_width) / 2;
+//     int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
+
+//     // main backdrop render
+//     SDL_Rect board = {screen_x, screen_y, rect_width, rect_height};
+//     SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1); // color
+//     SDL_RenderFillRect(renderer, &board);               // fill
+
+//     // SUB-BACKDROPS - GRID CHOICE BOXES
+//     int grid_pick_width = rect_width / 3;
+//     int grid_pick_height = rect_height / 5;
+//     int grid_pick_y = screen_y * 20;
+
+//     // small grid choice box placement
+//     SDL_Rect sm_grid = {screen_x * 3, grid_pick_y, grid_pick_width, grid_pick_height};
+//     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 1); // color
+//     SDL_RenderFillRect(renderer, &sm_grid);       // fill
+
+//     SDL_BUTTON
+
+//     // // medium grid choice box placement
+//     // SDL_Rect md_grid = {screen_x/2, grid_pick_y, grid_pick_width, grid_pick_height};
+//     // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 1); // color
+//     // SDL_RenderFillRect(renderer, &md_grid);       // fill
+
+//     // // large grid choice box placement
+//     // SDL_Rect lg_grid = {screen_x * 35, grid_pick_y, grid_pick_width, grid_pick_height};
+//     // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1); // color
+//     // SDL_RenderFillRect(renderer, &lg_grid);       // fill
+// }
+void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button button)
+{
+    // Main backdrop (existing code)
+    int margin = 25;
+    int rect_width = SCREEN_WIDTH - margin;
+    int rect_height = SCREEN_HEIGHT - margin;
     int screen_x = (SCREEN_WIDTH - rect_width) / 2;
     int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
-
-    // main backdrop render
     SDL_Rect board = {screen_x, screen_y, rect_width, rect_height};
-    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1); // color
-    SDL_RenderFillRect(renderer, &board);               // fill
+    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 255);
+    SDL_RenderFillRect(renderer, &board);
 
-    // SUB-BACKDROPS - GRID CHOICE BOXES
-    int grid_pick_width = rect_width / 3;
-    int grid_pick_height = rect_height / 5;
-    int grid_pick_y = screen_y * 20;
-
-    // small grid choice box placement
-    SDL_Rect sm_grid = {screen_x * 3, grid_pick_y, grid_pick_width, grid_pick_height};
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 1); // color
-    SDL_RenderFillRect(renderer, &sm_grid);       // fill
-    
-    // // medium grid choice box placement
-    // SDL_Rect md_grid = {screen_x/2, grid_pick_y, grid_pick_width, grid_pick_height};
-    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 1); // color
-    // SDL_RenderFillRect(renderer, &md_grid);       // fill
-    
-    // // large grid choice box placement
-    // SDL_Rect lg_grid = {screen_x * 35, grid_pick_y, grid_pick_width, grid_pick_height};
-    // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1); // color
-    // SDL_RenderFillRect(renderer, &lg_grid);       // fill
-}
+    // Draw the button
+    SDL_SetRenderDrawColor(renderer, button.color.r, button.color.g, button.color.b, button.color.a);
+    SDL_RenderFillRect(renderer, &button.rect);}
 
 int main(int argc, char **argv)
 {
@@ -116,6 +140,12 @@ int main(int argc, char **argv)
     int quit = 0;
     SDL_Event e;
 
+    SDL_Point mousePos;
+    Button button = {
+        .rect = {200, 200, 200, 50}, // Example button location and size
+        .color = {255, 0, 0, 255}    // Red color
+    };
+
     while (!quit)
     {
         // Handle events
@@ -125,6 +155,23 @@ int main(int argc, char **argv)
             {
                 quit = 1;
             }
+
+            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+            {
+                SDL_GetMouseState(&mousePos.x, &mousePos.y);
+                if (SDL_PointInRect(&mousePos, &button.rect))
+                {
+                    printf("Button clicked!\n");
+
+                    // Change the window title
+                    SDL_SetWindowTitle(window, "Button Clicked!");
+
+                    // Optional: Clear the screen and render new content
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Set a new background color (blue)
+                    SDL_RenderClear(renderer);
+                    SDL_RenderPresent(renderer);
+                }
+            }
         }
 
         // Clear screen
@@ -132,7 +179,7 @@ int main(int argc, char **argv)
         SDL_RenderClear(renderer);
 
         // Opening window
-        intro_screen(renderer, font); // create backdrop
+        intro_screen(renderer, font, button); // create backdrop
 
         // Update the screen
         SDL_RenderPresent(renderer);
