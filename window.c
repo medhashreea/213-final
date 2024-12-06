@@ -7,8 +7,10 @@
 #include "grids/small_grid.c"
 
 // Macros
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+// #define SCREEN_WIDTH 1280
+// #define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1900
+#define SCREEN_HEIGHT 1000
 
 typedef struct
 {
@@ -85,7 +87,8 @@ void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button button)
 
     // Draw the button
     SDL_SetRenderDrawColor(renderer, button.color.r, button.color.g, button.color.b, button.color.a);
-    SDL_RenderFillRect(renderer, &button.rect);}
+    SDL_RenderFillRect(renderer, &button.rect);
+}
 
 int main(int argc, char **argv)
 {
@@ -109,6 +112,7 @@ int main(int argc, char **argv)
     if (window == NULL)
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(window);
         SDL_Quit();
         return -1;
     }
@@ -155,21 +159,14 @@ int main(int argc, char **argv)
             {
                 quit = 1;
             }
-
-            if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
+            else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
+                SDL_Point mousePos;
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
                 if (SDL_PointInRect(&mousePos, &button.rect))
                 {
-                    printf("Button clicked!\n");
-
-                    // Change the window title
-                    SDL_SetWindowTitle(window, "Button Clicked!");
-
-                    // Optional: Clear the screen and render new content
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Set a new background color (blue)
-                    SDL_RenderClear(renderer);
-                    SDL_RenderPresent(renderer);
+                    small_grid_game(renderer, font); // Pass existing renderer and font to the game
+                    SDL_SetWindowTitle(window, "Small Snakes & Ladder");
                 }
             }
         }

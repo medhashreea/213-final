@@ -434,8 +434,6 @@ int main(int argc, char *argv[])
         player_row +=1; 
         player_col +=1;
 
-
-
         // Render Player
         //renderPlayer(renderer, player_position);
         //playerPosition++;
