@@ -1,3 +1,10 @@
 {
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "math.h": "c",
+        "sdl_image.h": "c",
+        "sdl_ttf.h": "c",
+        "sdl.h": "c",
+        "helpers.h": "c"
+    }
 }
