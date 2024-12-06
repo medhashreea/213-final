@@ -6,6 +6,7 @@
 
 #include "../helpers/dice.c"
 
+
 #define SCREEN_WIDTH 720  // Width of screen
 #define SCREEN_HEIGHT 950 // Height of screen
 #define CELL_WIDTH 50     // Width of each cell
@@ -63,6 +64,8 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Surface *snake2 = IMG_Load("grids/images/snake4.png"); // Load your PNG image
     SDL_Surface *snake3 = IMG_Load("grids/images/snake8.png"); // Load your PNG image
 
+
+    SDL_Surface *character = IMG_Load("grids/images/character.png"); // Load your PNG image
     // // // failure check
     // if (dice == NULL)
     // {
@@ -82,6 +85,13 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         return;
     }
 
+      if (character == NULL)
+    {
+        printf("Failed to load character image: %s\n", IMG_GetError());
+        return;
+    }
+
+
     // // // Init all dice
     // SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
 
@@ -95,6 +105,9 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Texture *snake_texture2 = SDL_CreateTextureFromSurface(renderer, snake2);
     SDL_Texture *snake_texture3 = SDL_CreateTextureFromSurface(renderer, snake3);
 
+    // Init character (SDL_Texture)
+    SDL_Texture *character_texture = SDL_CreateTextureFromSurface(renderer, character);
+
     // // Free all ladder Surface
     // SDL_FreeSurface(dice); // Free the surface after creating texture
 
@@ -107,6 +120,9 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_FreeSurface(snake);
     SDL_FreeSurface(snake2);
     SDL_FreeSurface(snake3);
+
+    // Free character 
+    SDL_FreeSurface(character);
 
     // if (dice_texture == NULL) // failure check
     // {
@@ -125,6 +141,9 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         printf("Failed to create snake texture: %s\n", SDL_GetError());
         return;
     }
+    if (character_texture == NULL) { // failure check 
+        printf("Failed to create character texture: %s\n", SDL_GetError());
+    }
 
     // // place dice
     // draw_img(renderer, dice_texture, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
@@ -132,12 +151,19 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     // place ladder
     draw_img(renderer, ladder_texture, 3, 1, 5, 3, screen_x, screen_y, 1, 1, 90);
     draw_img(renderer, ladder_texture2, 18, 2, 20, 4, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, ladder_texture3, 10, 1, 12, 3, screen_x, screen_y, 1, 1, 270);
+    draw_img(renderer, ladder_texture3, 10, 1, 12, 3, screen_x, screen_y, 1, 1, 0);
 
     // place snakes
-    draw_img(renderer, snake_texture, 15, 0, 13, 2, screen_x, screen_y, 1, 1, 270);
+    draw_img(renderer, snake_texture, 13, 0, 15, 2, screen_x, screen_y, 1, 1, 270);
     draw_img(renderer, snake_texture2, 18, -1, 23, 2, screen_x, screen_y, 1, 1, 0);
     draw_img(renderer, snake_texture3, 1, -1, 6, 2, screen_x, screen_y, 1, 1, 90);
+
+    int char_start_x = 23;
+    int char_start_y = -1; 
+    int char_end_x = 25;
+    int char_end_y = 0;
+
+    draw_img(renderer, character_texture, char_start_x, char_start_y, char_end_x, char_end_y, screen_x, screen_y, 1, 1, 0);
 
     // Free the image texture after rendering
     // SDL_DestroyTexture(dice_texture);
@@ -147,6 +173,8 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_DestroyTexture(snake_texture);
     SDL_DestroyTexture(snake_texture2);
     SDL_DestroyTexture(snake_texture3);
+    SDL_DestroyTexture(character_texture);
+    
 }
 
 /**
@@ -231,6 +259,7 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
             for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
             {
                 snprintf(numStr, sizeof(numStr), "%d", number++); // print value in cell
+                //renderPlayer(renderer, number);
 
                 // Create text surface and texture
                 SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
@@ -266,6 +295,35 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
     // call to function that places all snakes and ladders on grid (hard coded)
     place_imgs(renderer, screen_x, screen_y);
 } // draw_grid
+
+
+/**
+ * Renders the player at a given grid position.
+ *
+ * @param renderer The SDL renderer.
+ * @param row The player's row on the grid.
+ * @param col The player's column on the grid.
+ * @param playerTexture The player's texture (image or sprite).
+ */
+void renderPlayer(SDL_Renderer *renderer, int row, int col, SDL_Texture *playerTexture) {
+
+    // Screen offsets for the grid (if grid isn't at (0, 0))
+    //const int GRID_OFFSET_X = 25;
+    //const int GRID_OFFSET_Y = 50;
+
+    // Calculate screen coordinates
+    //int x = GRID_OFFSET_X + col * CELL_WIDTH;
+    //int y = GRID_OFFSET_Y + row * CELL_HEIGHT;
+    int x = col * CELL_WIDTH;
+    int y = row * CELL_HEIGHT;
+
+    // Define the destination rectangle for the player sprite
+    SDL_Rect destRect = {x, y, CELL_WIDTH, CELL_HEIGHT};
+
+    // Render the player texture
+    SDL_RenderCopy(renderer, playerTexture, NULL, &destRect);
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -323,6 +381,9 @@ int main(int argc, char *argv[])
     // Variable to hold the current dice texture
     SDL_Texture *dice_texture = NULL;
 
+    int player_row = 0;
+    int player_col = 0;
+
     while (!quit)
     {
         // Handle events
@@ -340,6 +401,7 @@ int main(int argc, char *argv[])
                     // Generate a random dice value and choose the corresponding texture
                     int dice_value = rand() % 6;
                     char *dice_choice = dice_paths[dice_value];
+
 
                     // Load the new dice texture
                     SDL_Surface *dice_surface = IMG_Load(dice_choice);
@@ -368,6 +430,15 @@ int main(int argc, char *argv[])
         // Draw the grid
         draw_grid(renderer, font);
         draw_dice(renderer, dice_texture);
+        // renderPlayer(renderer, player_row, player_col, player_texture);
+        player_row +=1; 
+        player_col +=1;
+
+
+
+        // Render Player
+        //renderPlayer(renderer, player_position);
+        //playerPosition++;
 
         // Update the screen
         SDL_RenderPresent(renderer);

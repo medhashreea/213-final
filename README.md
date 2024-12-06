@@ -13,7 +13,7 @@ Description:
     
     This is a game of Snakes & Ladders.
 
-// Compile: clang -o small_grid small_grid.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
+// Compile: clang -o grids/small_grid grids/small_grid.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
 
 Acknowledgements:
     
@@ -30,3 +30,5 @@ Acknowledgements:
         https://www.youtube.com/watch?v=zlKdOIQCnxA
 
         ChatGPT
+
+        Scheduler code is inspired by code from Lab: Worm which I worked on with Lydia Ye
