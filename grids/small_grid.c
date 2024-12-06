@@ -6,6 +6,7 @@
 
 #include "../helpers/dice.c"
 
+
 #define SCREEN_WIDTH 720  // Width of screen
 #define SCREEN_HEIGHT 950 // Height of screen
 #define CELL_WIDTH 50     // Width of each cell
@@ -258,6 +259,7 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
             for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
             {
                 snprintf(numStr, sizeof(numStr), "%d", number++); // print value in cell
+                //renderPlayer(renderer, number);
 
                 // Create text surface and texture
                 SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
@@ -293,6 +295,34 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font)
     // call to function that places all snakes and ladders on grid (hard coded)
     place_imgs(renderer, screen_x, screen_y);
 } // draw_grid
+
+
+/**
+ * Renders the player at a given grid position.
+ *
+ * @param renderer The SDL renderer.
+ * @param row The player's row on the grid.
+ * @param col The player's column on the grid.
+ * @param playerTexture The player's texture (image or sprite).
+ */
+void renderPlayer(SDL_Renderer *renderer, int row, int col, SDL_Texture *playerTexture) {
+
+    // Screen offsets for the grid (if grid isn't at (0, 0))
+    //const int GRID_OFFSET_X = 25;
+    //const int GRID_OFFSET_Y = 50;
+
+    // Calculate screen coordinates
+    //int x = GRID_OFFSET_X + col * CELL_WIDTH;
+    //int y = GRID_OFFSET_Y + row * CELL_HEIGHT;
+    int x = col * CELL_WIDTH;
+    int y = row * CELL_HEIGHT;
+
+    // Define the destination rectangle for the player sprite
+    SDL_Rect destRect = {x, y, CELL_WIDTH, CELL_HEIGHT};
+
+    // Render the player texture
+    SDL_RenderCopy(renderer, playerTexture, NULL, &destRect);
+}
 
 
 int main(int argc, char *argv[])
@@ -351,6 +381,9 @@ int main(int argc, char *argv[])
     // Variable to hold the current dice texture
     SDL_Texture *dice_texture = NULL;
 
+    int player_row = 0;
+    int player_col = 0;
+
     while (!quit)
     {
         // Handle events
@@ -368,6 +401,7 @@ int main(int argc, char *argv[])
                     // Generate a random dice value and choose the corresponding texture
                     int dice_value = rand() % 6;
                     char *dice_choice = dice_paths[dice_value];
+
 
                     // Load the new dice texture
                     SDL_Surface *dice_surface = IMG_Load(dice_choice);
@@ -396,6 +430,15 @@ int main(int argc, char *argv[])
         // Draw the grid
         draw_grid(renderer, font);
         draw_dice(renderer, dice_texture);
+        // renderPlayer(renderer, player_row, player_col, player_texture);
+        player_row +=1; 
+        player_col +=1;
+
+
+
+        // Render Player
+        //renderPlayer(renderer, player_position);
+        //playerPosition++;
 
         // Update the screen
         SDL_RenderPresent(renderer);

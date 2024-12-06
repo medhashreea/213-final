@@ -167,9 +167,54 @@ void task_wait(task_t handle) {
 /*
 * Either should switch direction or move it in a specific direction 
 */
-void direction_task() {
+void direction_task(int* position, Direction direction, int spacesMoved, int die) {
+  *position += die;
+
+  //if (isSnake) {
+  //}
+  //else if (isLadder) {
+//
+  //}
+ /* switch(die) {
+    case 1:
+    position +=1;
+    break;
+    case 2:
+    position +=2;
+    break;
+    case 3:
+    position +=3;
+    break;
+    case 4:
+    position +=4;
+    break;
+    case 5:
+    position +=5;
+    break;
+    case 6:
+    position +=6;
+    break;
+ }
+ */
+}
+
+
+/*
+* Checks if it's a snake
+*/
+bool isSnake(int position) {
 
 }
+
+/*
+* Checks if it's a ladder
+*/
+
+bool isLadder(int position) {
+
+}
+
+
 
 /**
  * Find the next available task to run
