@@ -3,46 +3,48 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
+#include "../helpers/helpers.h"
 
-#include "../helpers/dice.c"
+// #define SCREEN_WIDTH 1000  // Width of screen
+// #define SCREEN_HEIGHT 1000 // Height of screen
+#define SCREEN_WIDTH 1900
+#define SCREEN_HEIGHT 1000
+#define MED_CELL_WIDTH 50  // Width of each cell
+#define MED_CELL_HEIGHT 25 // Height of each cell
 
-#define SCREEN_WIDTH 1000  // Width of screen
-#define SCREEN_HEIGHT 1000 // Height of screen
-#define CELL_WIDTH 50     // Width of each cell
-#define CELL_HEIGHT 25    // Height of each cell
+// /**
+//  * Function to draw a diagonal ladder between two points
+//  */
+// void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
+// {
+//     // Calculate the start position in pixels (bottom of startRow, startCol)
+//     int startX = screen_x + startCol * MED_CELL_WIDTH + MED_CELL_WIDTH;
+//     int startY = screen_y + startRow * MED_CELL_HEIGHT + MED_CELL_HEIGHT / 2;
 
-/**
- * Function to draw a diagonal ladder between two points
- */
-void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
-{
-    // Calculate the start position in pixels (bottom of startRow, startCol)
-    int startX = screen_x + startCol * CELL_WIDTH + CELL_WIDTH;
-    int startY = screen_y + startRow * CELL_HEIGHT + CELL_HEIGHT / 2;
+//     // Calculate the end position in pixels (top of endRow, endCol)
+//     int endX = screen_x + endCol * MED_CELL_WIDTH + MED_CELL_WIDTH;
+//     int endY = screen_y + endRow * MED_CELL_HEIGHT + MED_CELL_HEIGHT / 2;
 
-    // Calculate the end position in pixels (top of endRow, endCol)
-    int endX = screen_x + endCol * CELL_WIDTH + CELL_WIDTH;
-    int endY = screen_y + endRow * CELL_HEIGHT + CELL_HEIGHT / 2;
+//     // Calculate the width (distance btw columns) and height (distance between columns)
+//     int ladderWidth = scale_x * abs(endX - startX);
+//     int ladderHeight = scale_y * abs(endY - startY);
 
-    // Calculate the width (distance btw columns) and height (distance between columns)
-    int ladderWidth = scale_x * abs(endX - startX);
-    int ladderHeight = scale_y * abs(endY - startY);
+//     // Calculate the angle of rotation (in radians) using the arctangent of slope
+//     double angle = atan2(endY - startY, endX - startX) * turn / M_PI;
 
-    // Calculate the angle of rotation (in radians) using the arctangent of slope
-    double angle = atan2(endY - startY, endX - startX) * turn / M_PI;
+//     // Create the rectangle for the ladder image
+//     SDL_Rect ladderRect = {startX, startY, ladderWidth, ladderHeight};
 
-    // Create the rectangle for the ladder image
-    SDL_Rect ladderRect = {startX, startY, ladderWidth, ladderHeight};
-
-    // Render the ladder texture, rotated to match diagonal
-    SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
-    // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
-} // draw_diagonal_ladder
+//     // Render the ladder texture, rotated to match diagonal
+//     SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
+//     // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
+// } // draw_diagonal_ladder
 
 /**
  * Places the Snakes and Ladders images
  */
-void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y) {
+void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
+{
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
     char *dice_choice = "";
 
@@ -92,15 +94,11 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y) {
     SDL_Texture *ladder_texture3 = SDL_CreateTextureFromSurface(renderer, ladder3);
     SDL_Texture *ladder_texture4 = SDL_CreateTextureFromSurface(renderer, ladder4);
 
-
-
     // Init all snakes (SDL_Texture)
     SDL_Texture *snake_texture = SDL_CreateTextureFromSurface(renderer, snake);
     SDL_Texture *snake_texture2 = SDL_CreateTextureFromSurface(renderer, snake2);
     SDL_Texture *snake_texture3 = SDL_CreateTextureFromSurface(renderer, snake3);
     SDL_Texture *snake_texture4 = SDL_CreateTextureFromSurface(renderer, snake4);
-
-
 
     // // Free all ladder Surface
     // SDL_FreeSurface(dice); // Free the surface after creating texture
@@ -136,20 +134,19 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y) {
     }
 
     // // place dice
-    // draw_img(renderer, dice_texture, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
+    // draw_img(renderer, dice_texture, int CELL_WIDTH, int CELL_HEIGHT, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
 
     // place ladder
-    draw_img(renderer, ladder_texture, 6, 1, 8, 3, screen_x, screen_y, 1, 1, 90);
-    draw_img(renderer, ladder_texture3, 26, 4, 28, 6, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, ladder_texture2, 33, 12, 35, 14, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, ladder_texture4, 12, 8, 14, 10, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 6, 1, 8, 3, screen_x, screen_y, 1, 1, 90);
+    draw_img(renderer, ladder_texture3,MED_CELL_WIDTH, MED_CELL_HEIGHT, 26, 4, 28, 6, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT,33, 12, 35, 14, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture4,MED_CELL_WIDTH, MED_CELL_HEIGHT, 12, 8, 14, 10, screen_x, screen_y, 1, 1, 0);
 
-        // place snakes
-    draw_img(renderer, snake_texture, 24, 0, 30, 4, screen_x, screen_y, 1, 1, 270);
-    draw_img(renderer, snake_texture2, 14, 4, 18, 8, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, snake_texture3, 1, 2, 5, 6, screen_x, screen_y, 1, 1, 90);
-    draw_img(renderer, snake_texture4, 20, 10, 24, 14, screen_x, screen_y, 1, 1, 0);
-    
+    // place snakes
+    draw_img(renderer, snake_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT,24, 0, 30, 4, screen_x, screen_y, 1, 1, 270);
+    draw_img(renderer, snake_texture2,MED_CELL_WIDTH, MED_CELL_HEIGHT, 14, 4, 18, 8, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, snake_texture3,MED_CELL_WIDTH, MED_CELL_HEIGHT, 1, 2, 5, 6, screen_x, screen_y, 1, 1, 90);
+    draw_img(renderer, snake_texture4,MED_CELL_WIDTH, MED_CELL_HEIGHT, 20, 10, 24, 14, screen_x, screen_y, 1, 1, 0);
 
     // Free the image texture after rendering
     // SDL_DestroyTexture(dice_texture);
@@ -164,16 +161,17 @@ void place_imgs(SDL_Renderer *renderer, int screen_x, int screen_y) {
 }
 
 /*
-* Creates the grid on the window and call image placement function
-*/
-void draw_grid(SDL_Renderer *renderer, TTF_Font *font) {
+ * Creates the grid on the window and call image placement function
+ */
+void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
+{
     int margin = 25; // margin size
     int rows = 40;
     int cols = 15;
 
     // calculate board dimensions
-    int width = (cols * CELL_WIDTH);   // 5 cells horizontally
-    int height = (rows * CELL_HEIGHT); // 25 rows vertically
+    int width = (cols * MED_CELL_WIDTH);   // 5 cells horizontally
+    int height = (rows * MED_CELL_HEIGHT); // 25 rows vertically
 
     // calculate board position
     int screen_x = (SCREEN_WIDTH - width) / 2;   // Center horizontally
@@ -187,12 +185,12 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font) {
     // Set the color for the grid lines (R, G, B, A)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color
 
-    for (int x = screen_x; x <= screen_x + width; x += CELL_WIDTH)
+    for (int x = screen_x; x <= screen_x + width; x += MED_CELL_WIDTH)
     {
         SDL_RenderDrawLine(renderer, x, screen_y, x, screen_y + height);
     } // vertical lines on board
 
-    for (int y = screen_y; y <= screen_y + height; y += CELL_HEIGHT)
+    for (int y = screen_y; y <= screen_y + height; y += MED_CELL_HEIGHT)
     {
         SDL_RenderDrawLine(renderer, screen_x, y, screen_x + width, y);
     } // horizontal lines on board
@@ -227,11 +225,11 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font) {
                     continue;
                 }
                 // Calculate text position (centered in the cell)
-                int cellX = screen_x + col * CELL_WIDTH;
-                int cellY = screen_y + row * CELL_HEIGHT;
+                int cellX = screen_x + col * MED_CELL_WIDTH;
+                int cellY = screen_y + row * MED_CELL_HEIGHT;
                 SDL_Rect textRect = {
-                    cellX + (CELL_WIDTH - textSurface->w) / 2,
-                    cellY + (CELL_HEIGHT - textSurface->h) / 2,
+                    cellX + (MED_CELL_WIDTH - textSurface->w) / 2,
+                    cellY + (MED_CELL_HEIGHT - textSurface->h) / 2,
                     textSurface->w,
                     textSurface->h};
                 SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
@@ -262,11 +260,11 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font) {
                 }
 
                 // Calculate text position (centered in the cell)
-                int cellX = screen_x + col * CELL_WIDTH;
-                int cellY = screen_y + row * CELL_HEIGHT;
+                int cellX = screen_x + col * MED_CELL_WIDTH;
+                int cellY = screen_y + row * MED_CELL_HEIGHT;
                 SDL_Rect textRect = {
-                    cellX + (CELL_WIDTH - textSurface->w) / 2,
-                    cellY + (CELL_HEIGHT - textSurface->h) / 2,
+                    cellX + (MED_CELL_WIDTH - textSurface->w) / 2,
+                    cellY + (MED_CELL_HEIGHT - textSurface->h) / 2,
                     textSurface->w,
                     textSurface->h};
                 SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
@@ -277,64 +275,62 @@ void draw_grid(SDL_Renderer *renderer, TTF_Font *font) {
     } // row loop
 
     // call to function that places all snakes and ladders on grid (hard coded)
-    place_imgs(renderer, screen_x, screen_y);
-} // draw_grid
+    place_medium_imgs(renderer, screen_x, screen_y);
+} // medium_grid
 
-int main(int argc, char *argv[])
+void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
-    // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-        return -1;
-    }
+    // // Initialize SDL
+    // if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    // {
+    //     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+    //     return -1;
+    // }
 
-    // Initialize SDL_ttf
-    if (TTF_Init() == -1)
-    {
-        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-        SDL_Quit();
-        return -1;
-    }
+    // // Initialize SDL_ttf
+    // if (TTF_Init() == -1)
+    // {
+    //     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+    //     SDL_Quit();
+    //     return -1;
+    // }
 
-    // Create window
-    SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL)
-    {
-        printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return -1;
-    }
+    // // Create window
+    // SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    // if (window == NULL)
+    // {
+    //     printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+    //     SDL_Quit();
+    //     return -1;
+    // }
 
-    // Create renderer
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL)
-    {
-        printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -1;
-    }
+    // // Create renderer
+    // SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    // if (renderer == NULL)
+    // {
+    //     printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
+    //     SDL_DestroyWindow(window);
+    //     SDL_Quit();
+    //     return -1;
+    // }
 
-    // Load font
-    TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
+    // // Load font
+    // TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
 
-    if (font == NULL)
-    {
-        printf("Failed to load font: %s\n", TTF_GetError());
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        TTF_Quit();
-        SDL_Quit();
-        return -1;
-    }
+    // if (font == NULL)
+    // {
+    //     printf("Failed to load font: %s\n", TTF_GetError());
+    //     SDL_DestroyRenderer(renderer);
+    //     SDL_DestroyWindow(window);
+    //     TTF_Quit();
+    //     SDL_Quit();
+    //     return -1;
+    // }
 
     // Main loop flag
     int quit = 0;
     SDL_Event e;
-
-    // Variable to hold the current dice texture
-    SDL_Texture *dice_texture = NULL;
+    SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
 
     while (!quit)
     {
@@ -379,25 +375,25 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         // Draw the grid
-        draw_grid(renderer, font);
+        medium_grid(renderer, font);
         draw_dice(renderer, dice_texture);
 
         // Update the screen
         SDL_RenderPresent(renderer);
     }
 
-    // Clean up and quit SDL
-    // Clean up and quit SDL
-    if (dice_texture != NULL)
-    {
-        SDL_DestroyTexture(dice_texture); // Free the texture when quitting
-    }
-    TTF_CloseFont(font);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    // SDL_DestroyTexture(currentImage);
-    TTF_Quit();
-    SDL_Quit();
+    // // Clean up and quit SDL
+    // // Clean up and quit SDL
+    // if (dice_texture != NULL)
+    // {
+    //     SDL_DestroyTexture(dice_texture); // Free the texture when quitting
+    // }
+    // TTF_CloseFont(font);
+    // SDL_DestroyRenderer(renderer);
+    // SDL_DestroyWindow(window);
+    // // SDL_DestroyTexture(currentImage);
+    // TTF_Quit();
+    // SDL_Quit();
 
-    return 0;
+    // return 0;
 }

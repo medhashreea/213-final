@@ -1,7 +1,9 @@
 # 213-final
 =====
+// Compile: clang helpers/helpers.c -o window window.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
 
-Last Updated: Wednesday, November 20, 2024
+
+Last Updated: Thursday, December 05, 2024
 
 Group:
     
@@ -12,8 +14,6 @@ Group:
 Description:
     
     This is a game of Snakes & Ladders.
-
-// Compile: clang -o grids/small_grid grids/small_grid.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
 
 Acknowledgements:
     

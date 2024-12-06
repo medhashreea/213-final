@@ -3,8 +3,11 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
+#include "helpers/helpers.h"
 
 #include "grids/small_grid.c"
+#include "grids/medium_grid.c"
+#include "grids/large_grid.c"
 
 // Macros
 // #define SCREEN_WIDTH 1280
@@ -16,6 +19,7 @@ typedef struct
 {
     SDL_Rect rect;   // Position and size of the button
     SDL_Color color; // Color of the button
+    char *label;
 } Button;
 /**
  * GRAPHICS TODO (25x5, 50x10, 100x50) - each grid is different file
@@ -35,47 +39,57 @@ typedef struct
  * IF FINISH EARLY
  * 1. add networking >_<
  */
-// void intro_screen(SDL_Renderer *renderer, TTF_Font *font)
-// {
-//     // MAIN BACKDROP
-//     int margin = 25;                              // margin size
-//     int rect_width = SCREEN_WIDTH - margin;   // Adjust width considering the margin
-//     int rect_height = SCREEN_HEIGHT - margin; // Adjust height considering the margin
 
-//     // Calculate the position to center the rectangle
-//     int screen_x = (SCREEN_WIDTH - rect_width) / 2;
-//     int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
-
-//     // main backdrop render
-//     SDL_Rect board = {screen_x, screen_y, rect_width, rect_height};
-//     SDL_SetRenderDrawColor(renderer, 207, 181, 163, 1); // color
-//     SDL_RenderFillRect(renderer, &board);               // fill
-
-//     // SUB-BACKDROPS - GRID CHOICE BOXES
-//     int grid_pick_width = rect_width / 3;
-//     int grid_pick_height = rect_height / 5;
-//     int grid_pick_y = screen_y * 20;
-
-//     // small grid choice box placement
-//     SDL_Rect sm_grid = {screen_x * 3, grid_pick_y, grid_pick_width, grid_pick_height};
-//     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 1); // color
-//     SDL_RenderFillRect(renderer, &sm_grid);       // fill
-
-//     SDL_BUTTON
-
-//     // // medium grid choice box placement
-//     // SDL_Rect md_grid = {screen_x/2, grid_pick_y, grid_pick_width, grid_pick_height};
-//     // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 1); // color
-//     // SDL_RenderFillRect(renderer, &md_grid);       // fill
-
-//     // // large grid choice box placement
-//     // SDL_Rect lg_grid = {screen_x * 35, grid_pick_y, grid_pick_width, grid_pick_height};
-//     // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 1); // color
-//     // SDL_RenderFillRect(renderer, &lg_grid);       // fill
-// }
-void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button button)
+void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *text, int x, int y)
 {
-    // Main backdrop (existing code)
+    if (text == NULL || text[0] == '\0')
+    {
+        // Don't render if the text is empty
+        return;
+    }
+
+    SDL_Surface *text_surface = TTF_RenderText_Blended(font, text, color);
+    if (!text_surface)
+    {
+        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+        return;
+    }
+
+    SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+    SDL_FreeSurface(text_surface);
+
+    if (!text_texture)
+    {
+        printf("Unable to create texture from rendered text! SDL_Error: %s\n", SDL_GetError());
+        return;
+    }
+
+    if (text_surface->w == 0 || text_surface->h == 0)
+    {
+        printf("Error: Rendered text surface has zero width or height!\n");
+        SDL_FreeSurface(text_surface);
+        return;
+    }
+
+    SDL_Rect text_rect = {x, y, text_surface->w, text_surface->h};
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
+    SDL_DestroyTexture(text_texture);
+}
+
+void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_box, SDL_Color text_color, char *input_text)
+{
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color for the box
+    SDL_RenderFillRect(renderer, entry_box);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black border for the box
+    SDL_RenderDrawRect(renderer, entry_box);
+
+    // Render the input text inside the box
+    render_text(renderer, font, text_color, input_text, entry_box->x + 5, entry_box->y + 5); // Offset for padding
+}
+
+void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Button medium_board, Button large_board)
+{
+    // Main backdrop
     int margin = 25;
     int rect_width = SCREEN_WIDTH - margin;
     int rect_height = SCREEN_HEIGHT - margin;
@@ -85,9 +99,51 @@ void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button button)
     SDL_SetRenderDrawColor(renderer, 207, 181, 163, 255);
     SDL_RenderFillRect(renderer, &board);
 
-    // Draw the button
-    SDL_SetRenderDrawColor(renderer, button.color.r, button.color.g, button.color.b, button.color.a);
-    SDL_RenderFillRect(renderer, &button.rect);
+    // Render the title at the top of the screen
+    char *title = "SNAKES AND LADDERS";
+    int title_x = (SCREEN_WIDTH - 300) / 2; // Centering title width (300 px wide)
+    int title_y = 50;                       // Fixed top margin
+    SDL_Color title_color = {255, 0, 255, 255};
+    TTF_Font *title_font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 48);
+    render_text(renderer, title_font, title_color, title, title_x - 100, title_y);
+    // // Set button positions at the bottom of the screen
+    // int button_margin = 20; // Space between buttons and screen edges
+    // int button_width = 200;
+    // int button_height = 50;
+
+    // // Center buttons at the bottom of the screen
+    // small_board.rect.x = (SCREEN_WIDTH - 3 * button_width - 2 * button_margin) / 2;
+    // small_board.rect.y = SCREEN_HEIGHT - button_height - button_margin;
+    // small_board.rect.w = button_width;
+    // small_board.rect.h = button_height;
+
+    // medium_board.rect.x = small_board.rect.x + button_width + button_margin;
+    // medium_board.rect.y = small_board.rect.y;
+    // medium_board.rect.w = button_width;
+    // medium_board.rect.h = button_height;
+
+    // large_board.rect.x = medium_board.rect.x + button_width + button_margin;
+    // large_board.rect.y = small_board.rect.y;
+    // large_board.rect.w = button_width;
+    // large_board.rect.h = button_height;
+
+    // Draw the small board button
+    SDL_SetRenderDrawColor(renderer, small_board.color.r, small_board.color.g, small_board.color.b, small_board.color.a);
+    SDL_RenderFillRect(renderer, &small_board.rect);
+
+    // Draw the medium board button
+    SDL_SetRenderDrawColor(renderer, medium_board.color.r, medium_board.color.g, medium_board.color.b, medium_board.color.a);
+    SDL_RenderFillRect(renderer, &medium_board.rect);
+
+    // Draw the large board button
+    SDL_SetRenderDrawColor(renderer, large_board.color.r, large_board.color.g, large_board.color.b, large_board.color.a);
+    SDL_RenderFillRect(renderer, &large_board.rect);
+
+    // Render labels for each button
+    SDL_Color text_color = {0, 0, 0, 255}; // Black color for the text
+    render_text(renderer, font, text_color, small_board.label, small_board.rect.x + (small_board.rect.w - 50) / 2, small_board.rect.y + (small_board.rect.h - 20) / 2);
+    render_text(renderer, font, text_color, medium_board.label, medium_board.rect.x + (medium_board.rect.w - 50) / 2, medium_board.rect.y + (medium_board.rect.h - 20) / 2);
+    render_text(renderer, font, text_color, large_board.label, large_board.rect.x + (large_board.rect.w - 50) / 2, large_board.rect.y + (large_board.rect.h - 20) / 2);
 }
 
 int main(int argc, char **argv)
@@ -108,7 +164,7 @@ int main(int argc, char **argv)
     }
 
     // Create window
-    SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Snakes & Ladders", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -144,11 +200,28 @@ int main(int argc, char **argv)
     int quit = 0;
     SDL_Event e;
 
-    SDL_Point mousePos;
-    Button button = {
-        .rect = {200, 200, 200, 50}, // Example button location and size
-        .color = {255, 0, 0, 255}    // Red color
-    };
+    Button small_board = {
+        .rect = {200, 200, 200, 50}, // button location and size
+        .color = {255, 0, 0, 255},   // red
+        .label = "Small board"};
+
+    Button medium_board = {
+        .rect = {SCREEN_WIDTH / 2 - 100, 200, 200, 50}, //  button location and size
+        .color = {0, 255, 0, 255},                      // green color
+        .label = "Medium board"};
+
+    Button large_board = {
+        .rect = {SCREEN_WIDTH - 400, 200, 200, 50}, //  button location and size
+        .color = {0, 0, 255, 255},                  // blue color
+        .label = "Large board"};
+
+    // Add an entry box for the number of players
+    SDL_Rect entry_box = {SCREEN_WIDTH / 2 - 100, 300, 200, 50};
+    char num_player[3] = ""; // To hold the number of players as a string
+    int num_length = 0;      // Length of current input
+
+    // Entry box color
+    SDL_Color num_color = {0, 0, 0, 255}; // Black for text
 
     while (!quit)
     {
@@ -159,14 +232,63 @@ int main(int argc, char **argv)
             {
                 quit = 1;
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_5 && num_length < sizeof(num_player) - 1)
+                {
+                    // Add the key to num_player if within valid range (1-5)
+                    num_player[num_length++] = e.key.keysym.sym - SDLK_0 + '0'; // Convert int to char
+                    num_player[num_length] = '\0';                              // Null-terminate the string
+                }
+                else if (e.key.keysym.sym == SDLK_BACKSPACE && num_length > 0)
+                {
+                    // Remove the last character if backspace is pressed
+                    num_length--;
+                    num_player[num_length] = '\0'; // Null-terminate the string
+                }
+                else if (e.key.keysym.sym == SDLK_RETURN)
+                {
+                    // Process the number of players when Enter is pressed
+                    if (num_length > 0)
+                    {
+                        int num_players = atoi(num_player);
+                        if (num_players >= 1 && num_players <= 5)
+                        {
+                            // Handle the selected number of players
+                            printf("Number of players: %d\n", num_players);
+                            // Implement logic to start the game with 'num_players' here
+                        }
+                        else
+                        {
+                            printf("Invalid number of players. Please choose a number between 1 and 5.\n");
+                        }
+                        // Reset input for the next input
+                        num_length = 0;
+                        num_player[0] = '\0';
+                    }
+                }
+            }
             else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
                 SDL_Point mousePos;
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
-                if (SDL_PointInRect(&mousePos, &button.rect))
+                if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
-                    small_grid_game(renderer, font); // Pass existing renderer and font to the game
-                    SDL_SetWindowTitle(window, "Small Snakes & Ladder");
+                    SDL_SetWindowTitle(window, "Small Game");       // change window name
+                    small_grid_game(renderer, font);                // Call small game
+                    SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
+                }
+                else if (SDL_PointInRect(&mousePos, &medium_board.rect))
+                {
+                    SDL_SetWindowTitle(window, "Medium Game");      // change window name
+                    medium_grid_game(renderer, font);               // Call medium game
+                    SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
+                }
+                else if (SDL_PointInRect(&mousePos, &large_board.rect))
+                {
+                    SDL_SetWindowTitle(window, "Large Game");       // change window name
+                    large_grid_game(renderer, font);                // Call large game
+                    SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
             }
         }
@@ -176,8 +298,8 @@ int main(int argc, char **argv)
         SDL_RenderClear(renderer);
 
         // Opening window
-        intro_screen(renderer, font, button); // create backdrop
-
+        intro_screen(renderer, font, small_board, medium_board, large_board); // create backdrop
+        player_entry_box(renderer, font, &entry_box, num_color, num_player);
         // Update the screen
         SDL_RenderPresent(renderer);
     }
