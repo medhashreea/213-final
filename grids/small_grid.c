@@ -3,6 +3,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
+#include <stdbool.h>
 #include "../helpers/helpers.h"
 
 // #define SCREEN_WIDTH 720  // Width of screen
@@ -40,16 +41,81 @@
 //     // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
 // } // draw_diagonal_ladder
 
+// __syncthreads_count(count)
+
+/*
+ * Ladder positions on the grid
+ */
+int ladders[3][2] = {{25, 34}, {63, 74}, {98, 107}};
+
+/*
+ * Snake positions on the grid
+ */
+
+int snakes[3][2] = {{28, 10}, {62, 43}, {119, 88}};
+
+// Global variables
+int dice_value;
+
+/*
+ * Returns new position
+ */
+
+int snakePosladderPos(int cur_pos)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        // Checks if it's a snake
+        if (cur_pos == snakes[i][0])
+        {
+            return snakes[i][1];
+        }
+        // Checks if it's a ladder
+        else if (cur_pos == ladders[i][0])
+        {
+            return ladders[i][1];
+        }
+    }
+    return cur_pos;
+}
+
+/*
+ * Checks if it's a snake or ladder
+ */
+bool isSnakeisLadder(int cur_pos)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        // Checks if it's a snake
+        return (cur_pos == snakes[i][0] || cur_pos == ladders[i][0]);
+    }
+    return false;
+}
+
+void movePlayer(int cur_pos)
+{
+    if (isSnakeisLadder(cur_pos))
+    {
+        snakePosladderPos(cur_pos);
+    }
+    else
+    {
+        cur_pos += dice_value;
+    }
+}
+
 /**
  * Places the Snakes and Ladders images
  */
 void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-    char *dice_choice = "";
+                            // char *dice_choice = "";
 
-    int dice_value = rand() % 6;
-    dice_choice = dice_paths[dice_value];
+    // int dice_value = rand() % 6;
+    //  dice_choice = dice_paths[dice_value];
+
+    // printf("You rolled a %d \n", dice_value);
 
     // // // init dice
     // char* dice_chose = roll_dice(renderer);
@@ -223,6 +289,7 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
             for (int col = 0; col < cols; col++) // for columns going left to right, increment
             {
                 snprintf(numStr, sizeof(numStr), "%d", number++); // print value in cell
+                movePlayer(number);
 
                 // Create text surface and texture
                 SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
@@ -292,6 +359,7 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
     // call to function that places all snakes and ladders on grid (hard coded)
     place_small_imgs(renderer, screen_x, screen_y);
+
 } // small_grid
 
 /**
@@ -324,53 +392,6 @@ void renderPlayer(SDL_Renderer *renderer, int row, int col, SDL_Texture *playerT
 
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
-    // // Initialize SDL
-    // if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    // {
-    //     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-    //     return -1;
-    // }
-
-    // // Initialize SDL_ttf
-    // if (TTF_Init() == -1)
-    // {
-    //     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create window
-    // SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    // if (window == NULL)
-    // {
-    //     printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create renderer
-    // SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    // if (renderer == NULL)
-    // {
-    //     printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_DestroyWindow(window);
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Load font
-    // TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
-
-    // if (font == NULL)
-    // {
-    //     printf("Failed to load font: %s\n", TTF_GetError());
-    //     SDL_DestroyRenderer(renderer);
-    //     SDL_DestroyWindow(window);
-    //     TTF_Quit();
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
     // Main loop flag
     int quit = 0;
     SDL_Event e;
@@ -408,6 +429,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     // Generate a random dice value and choose the corresponding texture
                     int dice_value = rand() % 6;
                     char *dice_choice = dice_paths[dice_value];
+                    printf("You rolled a %d \n", dice_value + 1);
 
                     // Load the new dice texture
                     SDL_Surface *dice_surface = IMG_Load(dice_choice);
@@ -437,8 +459,8 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         small_grid(renderer, font);
         draw_dice(renderer, dice_texture);
         // renderPlayer(renderer, player_row, player_col, player_texture);
-        player_row += 1;
-        player_col += 1;
+        // player_row += 1;
+        // player_col += 1;
 
         // Render Player
         // renderPlayer(renderer, player_position);
@@ -447,19 +469,4 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         // Update the screen
         SDL_RenderPresent(renderer);
     }
-
-    // // Clean up and quit SDL
-    // // Clean up and quit SDL
-    // if (dice_texture != NULL)
-    // {
-    //     SDL_DestroyTexture(dice_texture); // Free the texture when quitting
-    // }
-    // TTF_CloseFont(font);
-    // SDL_DestroyRenderer(renderer);
-    // SDL_DestroyWindow(window);
-    // // SDL_DestroyTexture(currentImage);
-    // TTF_Quit();
-    // SDL_Quit();
-
-    // return 0;
 }

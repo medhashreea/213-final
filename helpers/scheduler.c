@@ -8,6 +8,9 @@
 #include <ucontext.h>
 
 #include "util.h"
+#include "../grids/small_grid.c"
+
+extern int dice_value;
 
 // We might also want a task like isSnake or isLadder (I'm not reallly sure how it would check that though like would it ask is png or)
 
@@ -25,20 +28,16 @@ task_t find_task();
 #define STACK_SIZE 65536
 
 // This stores the state of the task
-typedef enum {ready, waiting, done} States;
-// This stores the directions 
-typedef enum {up, left, right, snake, ladder} Directions;
-
-// for small grid
-// if row is odd state should be set to right 
-// if row is even state should be set to left
-//
-
-// or should state be direction (then can set direction to either up, left, right)
-
+typedef enum
+{
+  ready,
+  waiting,
+  done
+} States;
 
 // This struct will hold the all the necessary information for each task
-typedef struct task_info {
+typedef struct task_info
+{
   // This field stores all the state required to switch back to this task
   ucontext_t context;
 
@@ -49,46 +48,43 @@ typedef struct task_info {
   // Task's state
   States states;
 
-  // Task's direction
-  Directions directions;
-
   // The task that the current task is waiting for
   task_t previousTask;
 
   // The number of spaces it should move based on the die
-  int spacesMoved;
+  // int spacesMoved;
 
-  // Was the task blocked waiting for user input?
+  // Did the user roll the die?
   bool isBlock;
 
   // Store the user input
   int input;
 } task_info_t;
 
-int current_task = 0;          //< The handle of the currently-executing task
-int num_tasks = 1;             //< The number of tasks created so far
-task_info_t tasks[MAX_TASKS];  //< Information for every task
+int current_task = 0;         //< The handle of the currently-executing task
+int num_tasks = 1;            //< The number of tasks created so far
+task_info_t tasks[MAX_TASKS]; //< Information for every task
 
 /**
  * Initialize the scheduler. Programs should call this before calling any other
  * functiosn in this file.
  */
-void scheduler_init() {
+void scheduler_init()
+{
 }
 
-
-// What Ellie said: 
+// What Ellie said:
 // save how many spaces it moved
-// have a function task to move it 
-// direction it's moving in 
-
+// have a function task to move it
+// direction it's moving in
 
 /**
  * This function will execute when a task's function returns. This allows you
  * to update scheduler states and start another task. This function is run
  * because of how the contexts are set up in the task_create function.
  */
-void task_exit() {
+void task_exit()
+{
   // Handle the end of a task's execution
   tasks[current_task].states = done;
 
@@ -104,7 +100,8 @@ void task_exit() {
  * \param handle  The handle for this task will be written to this location.
  * \param fn      The new task will run this function.
  */
-void task_create(task_t* handle, task_fn_t fn) {
+void task_create(task_t *handle, task_fn_t fn)
+{
   // Claim an index for the new task
   int index = num_tasks;
   num_tasks++;
@@ -150,10 +147,12 @@ void task_create(task_t* handle, task_fn_t fn) {
  *
  * \param handle  This is the handle produced by task_create
  */
-void task_wait(task_t handle) {
+void task_wait(task_t handle)
+{
   // If tasks of handle is not equal to done, then current task waits and set previous
   // task to handle
-  if (tasks[handle].states != done) {
+  if (tasks[handle].states != done)
+  {
     tasks[current_task].states = waiting;
     tasks[current_task].previousTask = handle;
 
@@ -164,87 +163,38 @@ void task_wait(task_t handle) {
   }
 }
 
-/*
-* Either should switch direction or move it in a specific direction 
-*/
-void direction_task(int* position, Direction direction, int spacesMoved, int die) {
-  *position += die;
-
-  //if (isSnake) {
-  //}
-  //else if (isLadder) {
-//
-  //}
- /* switch(die) {
-    case 1:
-    position +=1;
-    break;
-    case 2:
-    position +=2;
-    break;
-    case 3:
-    position +=3;
-    break;
-    case 4:
-    position +=4;
-    break;
-    case 5:
-    position +=5;
-    break;
-    case 6:
-    position +=6;
-    break;
- }
- */
-}
-
-
-/*
-* Checks if it's a snake
-*/
-bool isSnake(int position) {
-
-}
-
-/*
-* Checks if it's a ladder
-*/
-
-bool isLadder(int position) {
-
-}
-
-
-
 /**
  * Find the next available task to run
  *
  * \returns the index of the naxt available task
  */
-task_t find_task() {
+task_t find_task()
+{
   // Start with the first task after current task
   task_t i = (current_task + 1) % num_tasks;
-  int ch = getch();
 
-  while (true) {
-    if (tasks[i].states == ready) {
+  while (true)
+  {
+    if (tasks[i].states == ready)
+    {
       return i;
-    } else if (tasks[i].states == waiting && tasks[i].isBlock == false) {
+    }
+    else if (tasks[i].states == waiting && tasks[i].isBlock == false)
+    {
       // check if the task that it's waiting on is done
       task_t prev_index = tasks[i].previousTask;
-      if (tasks[prev_index].states == done) {
+      if (tasks[prev_index].states == done)
+      {
         tasks[i].states = ready;
         return i;
       }
-    } else if (tasks[i].states == sleep && time_ms() >= tasks[i].time_to_wake_up) {
-      // if the task is sleeping and the sleeping time has elapsed
-      tasks[i].states = ready;  // Wake up the task
-      return i;
-    } else if (tasks[i].isBlock == true && ch != ERR) {
+    }
+    else if (tasks[i].isBlock == true && die_value != ERR)
+    {
       // if the task is blocked for input and
       tasks[i].states = ready;
       tasks[i].isBlock = false;
-      tasks[i].input = ch;
+      tasks[i].input = die_value;
       return i;
     }
 
