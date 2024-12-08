@@ -236,16 +236,16 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
     // Main loop flag
     int quit = 0;
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
-    
+
     SDL_Surface *player_surface = IMG_Load("grids/images/character.png"); // Load the character image
-    if (player_surface == NULL) {
+    if (player_surface == NULL)
+    {
         printf("Failed to load player image: %s\n", IMG_GetError());
     }
     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
@@ -275,34 +275,30 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             {
                 quit = 1;
             }
-            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT))
             {
-                // Check if left mouse button was clicked
-                if (e.button.button == SDL_BUTTON_LEFT)
-                {
-                    // Generate a random dice value and choose the corresponding texture
-                    int dice_value = rand() % 6;
-                    char *dice_choice = dice_paths[dice_value];
-                    printf("You rolled a %d \n", dice_value + 1);
+                // Generate a random dice value and choose the corresponding texture
+                int dice_value = rand() % 6;
+                char *dice_choice = dice_paths[dice_value];
+                printf("You rolled a %d \n", dice_value + 1);
 
-                    // Load the new dice texture
-                    SDL_Surface *dice_surface = IMG_Load(dice_choice);
-                    if (dice_surface == NULL)
-                    {
-                        printf("Failed to load dice image: %s\n", IMG_GetError());
-                    }
-                    else
-                    {
-                        // Create the texture from the loaded surface
-                        if (dice_texture != NULL)
-                        {
-                            SDL_DestroyTexture(dice_texture); // Clean up the previous texture
-                        }
-                        dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
-                        SDL_FreeSurface(dice_surface); // Free the surface after creating texture
-                    }
+                // Load the new dice texture
+                SDL_Surface *dice_surface = IMG_Load(dice_choice);
+                if (dice_surface == NULL)
+                {
+                    printf("Failed to load dice image: %s\n", IMG_GetError());
                 }
-            }
+                else
+                {
+                    // Create the texture from the loaded surface
+                    if (dice_texture != NULL)
+                    {
+                        SDL_DestroyTexture(dice_texture); // Clean up the previous texture
+                    }
+                    dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
+                    SDL_FreeSurface(dice_surface); // Free the surface after creating texture
+                }
+            } // Check if left mouse button was clicked
         }
 
         // Clear screen

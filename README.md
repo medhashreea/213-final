@@ -31,7 +31,4 @@ Acknowledgements:
 
         ChatGPT
 
-        Scheduler code is inspired by code from Lab: Worm which I worked on with Lydia Ye
-
-
-        // ctr c gets to home, ctrc c again gets it to exit 
+        Scheduler code is inspired by code from Lab: Worm which Alyssa Trapp worked on with Lydia Ye

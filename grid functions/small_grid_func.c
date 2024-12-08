@@ -8,65 +8,21 @@
 
 // __syncthreads_count(count)
 
+// Global variables
+int dice_value;
+
 /*
  * Ladder positions on the grid
  */
-int ladders[3][2] = {{25, 34}, {63, 74}, {98, 107}};
+int small_ladders[3][2] = {{25, 34}, {63, 74}, {98, 107}};
 
 /*
  * Snake positions on the grid
  */
 
-int snakes[3][2] = {{28, 10}, {62, 43}, {119, 88}};
+int small_snakes[3][2] = {{28, 10}, {62, 43}, {119, 88}};
 
-// Global variables
-int dice_value;
 
-/*
- * Returns new position
- */
-int snake_ladder_pos(int cur_pos)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        // Checks if it's a snake
-        if (cur_pos == snakes[i][0])
-        {
-            return snakes[i][1];
-        }
-        // Checks if it's a ladder
-        else if (cur_pos == ladders[i][0])
-        {
-            return ladders[i][1];
-        }
-    }
-    return cur_pos;
-}
-
-/*
- * Checks if it's a snake or ladder
- */
-bool snake_or_ladder(int cur_pos)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        // Checks if it's a snake
-        return (cur_pos == snakes[i][0] || cur_pos == ladders[i][0]);
-    }
-    return false;
-}
-
-void move_player(int cur_pos)
-{
-    if (snake_or_ladder(cur_pos))
-    {
-        snake_ladder_pos(cur_pos);
-    }
-    else
-    {
-        cur_pos += dice_value;
-    }
-}
 
 /**
  * Renders the player at a given grid position.
