@@ -33,15 +33,6 @@ void task_create(task_t* handle, task_fn_t fn);
 void task_wait(task_t handle);
 
 /**
- * The currently-executing task should sleep for a specified time. If that time is larger
- * than zero, the scheduler should suspend this task and run a different task until at least
- * ms milliseconds have elapsed.
- *
- * \param ms  The number of milliseconds the task should sleep.
- */
-void task_sleep(size_t ms);
-
-/**
  * Read a character from user input. If no input is available, the task should
  * block until input becomes available. The scheduler should run a different
  * task while this task is blocked.

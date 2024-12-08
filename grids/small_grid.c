@@ -6,40 +6,10 @@
 #include <stdbool.h>
 #include "../helpers/helpers.h"
 
-// #define SCREEN_WIDTH 720  // Width of screen
-// #define SCREEN_HEIGHT 950 // Height of screen
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 #define SMALL_CELL_WIDTH 50  // Width of each cell
 #define SMALL_CELL_HEIGHT 35 // Height of each cell
-
-// /**
-//  * Function to draw a diagonal ladder between two points
-//  */
-// void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
-// {
-//     // Calculate the start position in pixels (bottom of startRow, startCol)
-//     int startX = screen_x + startCol * SMALL_CELL_WIDTH + SMALL_CELL_WIDTH;
-//     int startY = screen_y + startRow * SMALL_CELL_HEIGHT + SMALL_CELL_HEIGHT / 2;
-
-//     // Calculate the end position in pixels (top of endRow, endCol)
-//     int endX = screen_x + endCol * SMALL_CELL_WIDTH + SMALL_CELL_WIDTH;
-//     int endY = screen_y + endRow * SMALL_CELL_HEIGHT + SMALL_CELL_HEIGHT / 2;
-
-//     // Calculate the width (distance btw columns) and height (distance between columns)
-//     int ladderWidth = scale_x * abs(endX - startX);
-//     int ladderHeight = scale_y * abs(endY - startY);
-
-//     // Calculate the angle of rotation (in radians) using the arctangent of slope
-//     double angle = atan2(endY - startY, endX - startX) * turn / M_PI;
-
-//     // Create the rectangle for the ladder image
-//     SDL_Rect ladderRect = {startX, startY, ladderWidth, ladderHeight};
-
-//     // Render the ladder texture, rotated to match diagonal
-//     SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
-//     // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
-// } // draw_diagonal_ladder
 
 // __syncthreads_count(count)
 
@@ -60,8 +30,7 @@ int dice_value;
 /*
  * Returns new position
  */
-
-int snakePosladderPos(int cur_pos)
+int snake_ladder_pos(int cur_pos)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -82,7 +51,7 @@ int snakePosladderPos(int cur_pos)
 /*
  * Checks if it's a snake or ladder
  */
-bool isSnakeisLadder(int cur_pos)
+bool snake_or_ladder(int cur_pos)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -92,11 +61,11 @@ bool isSnakeisLadder(int cur_pos)
     return false;
 }
 
-void movePlayer(int cur_pos)
+void move_player(int cur_pos)
 {
-    if (isSnakeisLadder(cur_pos))
+    if (snake_or_ladder(cur_pos))
     {
-        snakePosladderPos(cur_pos);
+        snake_ladder_pos(cur_pos);
     }
     else
     {
@@ -110,16 +79,6 @@ void movePlayer(int cur_pos)
 void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-                            // char *dice_choice = "";
-
-    // int dice_value = rand() % 6;
-    //  dice_choice = dice_paths[dice_value];
-
-    // printf("You rolled a %d \n", dice_value);
-
-    // // // init dice
-    // char* dice_chose = roll_dice(renderer);
-    // SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
 
     // Init all ladders (SDL_Surface)
     SDL_Surface *ladder = IMG_Load("grids/images/ladder.png");   // Load your PNG image
@@ -131,12 +90,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Surface *snake3 = IMG_Load("grids/images/snake8.png"); // Load your PNG image
 
     SDL_Surface *character = IMG_Load("grids/images/character.png"); // Load your PNG image
-    // // // failure check
-    // if (dice == NULL)
-    // {
-    //     printf("Failed to load dice: %s\n", IMG_GetError());
-    //     return;
-    // }
 
     if (ladder == NULL || ladder2 == NULL || ladder3 == NULL)
     {
@@ -156,9 +109,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         return;
     }
 
-    // // // Init all dice
-    // SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
-
     // Init all ladders (SDL_Texture)
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
     SDL_Texture *ladder_texture2 = SDL_CreateTextureFromSurface(renderer, ladder2);
@@ -172,9 +122,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     // Init character (SDL_Texture)
     SDL_Texture *character_texture = SDL_CreateTextureFromSurface(renderer, character);
 
-    // // Free all ladder Surface
-    // SDL_FreeSurface(dice); // Free the surface after creating texture
-
     // Free all ladder Surface
     SDL_FreeSurface(ladder); // Free the surface after creating texture
     SDL_FreeSurface(ladder2);
@@ -187,12 +134,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 
     // Free character
     SDL_FreeSurface(character);
-
-    // if (dice_texture == NULL) // failure check
-    // {
-    //     printf("Failed to create dice texture: %s\n", SDL_GetError());
-    //     return;
-    // }
 
     if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL) // failure check
     {
@@ -209,9 +150,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     { // failure check
         printf("Failed to create character texture: %s\n", SDL_GetError());
     }
-
-    // // place dice
-    // draw_img(renderer, dice_texture, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
 
     // place ladder
     draw_img(renderer, ladder_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, 3, 1, 5, 3, screen_x, screen_y, 1, 1, 90);
@@ -230,8 +168,6 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 
     draw_img(renderer, character_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y, char_end_x, char_end_y, screen_x, screen_y, 1, 1, 0);
 
-    // Free the image texture after rendering
-    // SDL_DestroyTexture(dice_texture);
     SDL_DestroyTexture(ladder_texture);
     SDL_DestroyTexture(ladder_texture2);
     SDL_DestroyTexture(ladder_texture3);
