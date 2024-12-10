@@ -2,15 +2,15 @@
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
-#include "helpers/sfunc.h"
-
-// #include "helpers/scheduler.h"
+#include "helpers/scheduler.h"
+#include "helpers/scheduler.c"
 #include "helpers/util.h"
 
 int main (int argc, char** argv) { 
     bool running = true; 
     position = 0;
     long long last_time = time_ms();
+    font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
     draw_board(renderer, font);
     while(running) {
         int current_time = time_ms();
