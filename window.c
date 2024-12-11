@@ -9,9 +9,8 @@
 #include "grids/medium_grid.c"
 #include "grids/large_grid.c"
 
+
 // Macros
-// #define SCREEN_WIDTH 1280
-// #define SCREEN_HEIGHT 720
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 
@@ -234,7 +233,7 @@ int main(int argc, char **argv)
             }
             else if (e.type == SDL_KEYDOWN)
             {
-                if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_5 && num_length < sizeof(num_player) - 1)
+                if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_4 && num_length < 1) // only takes first number input
                 {
                     // Add the key to num_player if within valid range (1-5)
                     num_player[num_length++] = e.key.keysym.sym - SDLK_0 + '0'; // Convert int to char
@@ -252,7 +251,7 @@ int main(int argc, char **argv)
                     if (num_length > 0)
                     {
                         int num_players = atoi(num_player);
-                        if (num_players >= 1 && num_players <= 5)
+                        if (num_players >= 1 && num_players <= 4)
                         {
                             // Handle the selected number of players
                             printf("Number of players: %d\n", num_players);
@@ -260,7 +259,7 @@ int main(int argc, char **argv)
                         }
                         else
                         {
-                            printf("Invalid number of players. Please choose a number between 1 and 5.\n");
+                            printf("Invalid number of players. Please choose a number between 1 and 4.\n");
                         }
                         // Reset input for the next input
                         num_length = 0;
