@@ -1,9 +1,7 @@
 int dice_value;
 int cur_pos;
 
-/**
- *  Draw board
- */
+
 void draw_board (SDL_Renderer *renderer, int screen_x, int screen_y)
 {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
@@ -114,7 +112,7 @@ void move_player(int cur_pos)
 {
     if (snake_or_ladder(cur_pos))
     {
-        snake_ladder_pos(cur_pos);
+       cur_pos = snake_ladder_pos(cur_pos);
     }
     else
     {

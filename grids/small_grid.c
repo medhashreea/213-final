@@ -266,6 +266,15 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
     int player_row = 0;
     int player_col = 0;
 
+    enum States
+    {
+        "die",
+        "move character",
+        "win"
+    };
+    States cur_state = "die";
+    int counter = 0;
+
     while (!quit)
     {
         // Handle events
@@ -275,7 +284,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             {
                 quit = 1;
             }
-            else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT))
+            else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && cur_state == "die")
             {
                 // Generate a random dice value and choose the corresponding texture
                 int dice_value = rand() % 6;
@@ -308,6 +317,15 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         // Draw the grid
         small_grid(renderer, font);
         draw_dice(renderer, dice_texture);
+
+        if (state = "movePlayer")
+        {
+            // want func to draw at each frame (have to do one step) (use counter as position and move it each time)
+
+            // at end we want to move player to final state
+             movePlayer();
+             state = "dice"; 
+        }
         // renderPlayer(renderer, player_row, player_col, player_texture);
         // player_row += 1;
         // player_col += 1;
@@ -319,4 +337,5 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         // Update the screen
         SDL_RenderPresent(renderer);
     }
+    counter++;
 }
