@@ -22,7 +22,6 @@ typedef enum
 } States;
 States state = die;
 int pos = 0;
-int dice_value;
 
 /*
  * Ladder positions on the grid
@@ -74,18 +73,8 @@ int char_start_y = -1;
 int char_end_x = 25;
 int char_end_y = 0;
 
-void move_player(SDL_Renderer *renderer)
+void move_player(SDL_Renderer *renderer, SDL_Texture *player_texture)
 {
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-
-    SDL_Surface *player_surface = IMG_Load("grids/images/character.png"); // Load the character image
-    if (player_surface == NULL)
-    {
-        printf("Failed to load player image: %s\n", IMG_GetError());
-    }
-    SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
-    SDL_FreeSurface(player_surface); // Free the surface after creating the texture
-
     int margin = 25; // margin size
     int rows = 25;
     int cols = 5;
@@ -111,14 +100,14 @@ void move_player(SDL_Renderer *renderer)
     {
         if ((row % 2) == 0) // check if row is even
         {
-            for (int col = char_start_y; col < cols; col++) // for columns going left to right, move player right
+            for (int col = char_start_y; col < char_end_y; col++) // for columns going left to right, move player right
             {
                 draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y++, char_end_x, char_end_y++, screen_x, screen_y, 1, 1, 0);
             }
         }
         else
         {
-            for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
+            for (int col = char_end_y - 1; col > char_start_y; col--) // for columns going right to left , decrement
             {
                 draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y--, char_end_x, char_end_y--, screen_x, screen_y, 1, 1, 0);
             } // column loop
@@ -126,7 +115,7 @@ void move_player(SDL_Renderer *renderer)
     } // row loop
 }
 
-int update_pos()
+int update_pos(int dice_value)
 {
     if (snake_or_ladder())
     {
@@ -341,12 +330,19 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
-    srand(time(NULL));
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
     // Main loop flag
     int quit = 0;
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
+
+    SDL_Surface *player_surface = IMG_Load("grids/images/character.png"); // Load the character image
+    if (player_surface == NULL)
+    {
+        printf("Failed to load player image: %s\n", IMG_GetError());
+    }
+    SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
+    SDL_FreeSurface(player_surface); // Free the surface after creating the texture
 
     int counter = 0;
 
@@ -355,6 +351,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         // Handle events
         while (SDL_PollEvent(&e) != 0)
         {
+            int dice_value;
             if (e.type == SDL_QUIT)
             {
                 quit = 1;
@@ -362,7 +359,8 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
                 // Generate a random dice value and choose the corresponding texture
-                int dice_value = rand() % 6;
+                srand(time(NULL));
+                dice_value = rand() % 6;
                 char *dice_choice = dice_paths[dice_value];
                 printf("You rolled a %d \n", dice_value + 1);
 
@@ -391,7 +389,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                 // want func to draw at each frame (have to do one step) (use counter as position and move it each time)
 
                 // at end we want to move player to final state
-                int final_pos = update_pos();
+                int final_pos = update_pos(dice_value);
                 // move_player(renderer, player_texture);
                 // final_pos_player();
                 if (pos == FINAL_POS)
@@ -403,31 +401,32 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                 counter++;
                 // Update the screen
                 // SDL_RenderPresent(renderer);
-                state = die;
-                // Clear screen
+                // state = die;
             }
 
+            // Clear screen
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
             SDL_RenderClear(renderer);
 
             // Draw the grid
             small_grid(renderer, font);
             draw_dice(renderer, dice_texture);
-            move_player(renderer); // render init image
+            move_player(renderer, player_texture); // render init image
+            SDL_RenderPresent(renderer);
 
-            for (int i = 1; i <= dice_value + 1; i++)
-            {
-                printf("die is: %d \n", dice_value);
-                printf("die val at: %d \n", i);
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-                SDL_RenderClear(renderer);
-                small_grid(renderer, font);
-                draw_dice(renderer, dice_texture);
-                move_player(renderer);
-                SDL_RenderPresent(renderer);
-            } // Render the player after updating the position
+            // for (int i = 1; i <= dice_value; i++)
+            // {
+            //     printf("die is: %d \n", dice_value);
+            //     printf("die val at: %d \n", i);
+            //     // SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+            //     // SDL_RenderClear(renderer);
+            //     small_grid(renderer, font);
+            //     draw_dice(renderer, dice_texture);
+            //     move_player(renderer, player_texture);
+            //     SDL_RenderPresent(renderer);
+            // } // Render the player after updating the position
         } // Update the screen
-        SDL_RenderPresent(renderer);
+        // SDL_RenderPresent(renderer);
     }
 }
 
