@@ -19,7 +19,7 @@ Acknowledgements:
     
     Professor Charlie Curtsinger
 
-    Mentors: 
+    Mentors: Almond, Ellie, and Jeromino
 
     Links: 
         

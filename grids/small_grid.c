@@ -22,7 +22,6 @@ typedef enum
 } States;
 States state = die;
 int pos = 0;
-//int dice_value;
 
 /*
  * Ladder positions on the grid
@@ -69,10 +68,13 @@ bool snake_or_ladder()
     return false;
 }
 
-int char_start_x = 23;
-int char_start_y = -1;
-int char_end_x = 25;
-int char_end_y = 0;
+
+
+
+// int char_start_x = 23;
+// int char_start_y = -1;
+// int char_end_x = 25;
+// int char_end_y = 0;
 
 void move_player(SDL_Renderer *renderer)
 {
@@ -114,6 +116,7 @@ void move_player(SDL_Renderer *renderer)
             for (int col = char_start_y; col < cols; col++) // for columns going left to right, move player right
             {
                 draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y++, char_end_x, char_end_y++, screen_x, screen_y, 1, 1, 0);
+                //SDL_Delay(500);
             }
         }
         else
@@ -121,10 +124,14 @@ void move_player(SDL_Renderer *renderer)
             for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
             {
                 draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y--, char_end_x, char_end_y--, screen_x, screen_y, 1, 1, 0);
+                //SDL_Delay(500);
             } // column loop
         } // cond check for odd/even rows
     } // row loop
 }
+
+
+
 
 int update_pos(int dice_value)
 {
@@ -339,6 +346,53 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
+
+// void move_player(SDL_Renderer *renderer, TTF_Font *font, int cur_pos, int end_pos) {
+//     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+
+//     // Load character PNG
+//     SDL_Surface *player_surface = IMG_Load("grids/images/character.png");
+//     if (player_surface == NULL) {
+//         printf("Failed to load player image: %s\n", IMG_GetError());
+//         return;
+//     }
+//     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
+//     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
+
+//     // Character position and size
+//     SDL_Rect character_rect;
+//     character_rect.w = SMALL_CELL_WIDTH;   // Set width
+//     character_rect.h = SMALL_CELL_HEIGHT; // Set height
+
+//     // Starting position
+//     character_rect.x = cur_pos;
+//     character_rect.y = SCREEN_HEIGHT - character_rect.h;
+
+//     // Animate character movement
+//     for (int pos = cur_pos; pos <= end_pos; pos++) {
+//         // Clear screen
+//         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+//         SDL_RenderClear(renderer);
+
+//         // Update character position
+//         character_rect.x += pos; // Move 10 pixels to the right per step
+//         character_rect.y -= pos; // Move 5 pixels up per step
+
+//         // Render the character at the new position
+//         SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
+
+//         small_grid(renderer, font);
+//         // Present updated frame
+//         SDL_RenderPresent(renderer);
+
+//         // Delay to make the movement visible
+//         SDL_Delay(100); // 100 ms delay between frames
+//     }
+
+//     // Cleanup
+//     SDL_DestroyTexture(player_texture);
+// }
+
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
     srand(time(NULL));
@@ -348,10 +402,8 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
 
-    int counter = 0;
-
-       int cur_dice_step;
-       int dice_value;
+    int cur_dice_step;
+    int dice_value;
 
     while (!quit)
     {
@@ -417,75 +469,30 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                 else {
                 state = die;
                 }
+                
                 if (cur_dice_step == dice_value) {
                 SDL_RenderPresent(renderer);
                 }
-                //pos++;
-                //counter++;
-                // Update the screen
-                // SDL_RenderPresent(renderer);
-                //state = die;
-                // Clear screen
             }
 
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
             SDL_RenderClear(renderer);
 
             // Draw the grid
-            small_grid(renderer, font);
             draw_dice(renderer, dice_texture);
-            move_player(renderer); // render init image
+            int start_pos = 0; 
+            int end_pos = start_pos + dice_value;
+            move_player(renderer, font, start_pos, end_pos); // render init image
 
             // for (int i = 1; i <= dice_value + 1; i++)
-            {
+            // {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
                 SDL_RenderClear(renderer);
-                small_grid(renderer, font);
-                draw_dice(renderer, dice_texture);
-                move_player(renderer);
-            } // Render the player after updating the position
+                //small_grid(renderer, font);
+                //draw_dice(renderer, dice_texture);
+                //move_player(renderer, font, 0, 2);
+            // } // Render the player after updating the position
         } // Update the screen
         SDL_RenderPresent(renderer);
     }
 }
-
-// if (state ==  move)
-// {
-//     // want func to draw at each frame (have to do one step) (use counter as position and move it each time)
-
-//     // at end we want to move player to final state
-//      move_player();
-//      final_pos_player();
-//      if (pos == final_pos) {
-//      state = win;
-//      else {
-//      state = die;
-//      }
-//     }
-//      pos++;
-//      counter++;
-//     // Update the screen
-//     SDL_RenderPresent(renderer);
-// }
-// renderPlayer(renderer, player_row, player_col, player_texture);
-// player_row += 1;
-// player_col += 1;
-
-// Render Player
-// renderPlayer(renderer, player_position);
-// playerPosition++;
-
-// if (state == move) {
-//     // Increment the position to the next cell
-//     pos++;
-//     if (pos >= FINAL_POS) {
-//         pos = FINAL_POS;
-//         state = win; // End game if the final position is reached
-//     } else {
-//         final_pos_player(); // Handle snakes and ladders
-//         if (pos == FINAL_POS) {
-//             state = win;
-//         } else {
-//             state = die; // Return to dice roll state
-//         }
-//     }

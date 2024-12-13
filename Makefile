@@ -1,23 +1,13 @@
-# CC = clang
-# CFLAGS = `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
+CC := clang
+CFLAGS := -o -fsanitize=address
+TARGETS := window
 
-# # Source files and object files
-# SRC = window.c helpers/helpers.c 
-# OBJ = $(SRC:.c=.o)
+all: $(TARGETS)
 
-# # Executable name
-# TARGET = window
+clean:
+	rm -f $(TARGETS)
 
-# # Default rule (build the program)
-# all: $(TARGET)
-
-# $(TARGET): $(OBJ)
-# 	$(CC) $(OBJ) -o $(TARGET) $(CFLAGS)
-
-# # Rule to compile .c files to .o files
-# %.o: %.c
-# 	$(CC) $(CFLAGS) -c $< -o $@
-
-# # Clean up build artifacts
-# clean:
-# 	rm -f $(OBJ) $(TARGET)
+%: %.c
+	@echo Compiling $<
+	$(CC) $(CFLAGS) -o $@ $<
+	@echo
