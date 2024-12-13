@@ -22,7 +22,7 @@ typedef enum
 } States;
 States state = die;
 int pos = 0;
-int dice_value;
+//int dice_value;
 
 /*
  * Ladder positions on the grid
@@ -126,7 +126,7 @@ void move_player(SDL_Renderer *renderer)
     } // row loop
 }
 
-int update_pos()
+int update_pos(int dice_value)
 {
     if (snake_or_ladder())
     {
@@ -350,6 +350,9 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 
     int counter = 0;
 
+       int cur_dice_step;
+       int dice_value;
+
     while (!quit)
     {
         // Handle events
@@ -362,9 +365,11 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
                 // Generate a random dice value and choose the corresponding texture
-                int dice_value = rand() % 6;
+                dice_value = rand() % 6;
+                cur_dice_step = 1;
                 char *dice_choice = dice_paths[dice_value];
                 printf("You rolled a %d \n", dice_value + 1);
+                // printf("die is: %d \n", dice_value + 1);
 
                 // Load the new dice texture
                 SDL_Surface *dice_surface = IMG_Load(dice_choice);
@@ -382,28 +387,44 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
                     SDL_FreeSurface(dice_surface); // Free the surface after creating texture
                 }
+                // for (int i = cur_dice_step; cur_dice_step < dice_value; i++) {
+                while (cur_dice_step <= dice_value + 1) {
+                  printf("die step at: %d \n", cur_dice_step);
+                  cur_dice_step++;
+                }
                 state = move;
+                //cur_dice_step++;
             } // Check if left mouse button was clicked
 
             // char move, not dealing with images at all!!!
             if (state == move)
             {
                 // want func to draw at each frame (have to do one step) (use counter as position and move it each time)
-
                 // at end we want to move player to final state
-                int final_pos = update_pos();
+                int pos = update_pos(dice_value);
+                if (cur_dice_step < dice_value) {
+                    pos++;
+                    cur_dice_step++;
+                    printf("Moving to position: %d\n", pos);
+                }
                 // move_player(renderer, player_texture);
                 // final_pos_player();
-                if (pos == FINAL_POS)
+                if (pos >= FINAL_POS)
                 {
                     state = win;
+                    printf("You win\n");
                 }
+                else {
                 state = die;
-                pos++;
-                counter++;
+                }
+                if (cur_dice_step == dice_value) {
+                SDL_RenderPresent(renderer);
+                }
+                //pos++;
+                //counter++;
                 // Update the screen
                 // SDL_RenderPresent(renderer);
-                state = die;
+                //state = die;
                 // Clear screen
             }
 
@@ -415,16 +436,13 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             draw_dice(renderer, dice_texture);
             move_player(renderer); // render init image
 
-            for (int i = 1; i <= dice_value + 1; i++)
+            // for (int i = 1; i <= dice_value + 1; i++)
             {
-                printf("die is: %d \n", dice_value);
-                printf("die val at: %d \n", i);
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
                 SDL_RenderClear(renderer);
                 small_grid(renderer, font);
                 draw_dice(renderer, dice_texture);
                 move_player(renderer);
-                SDL_RenderPresent(renderer);
             } // Render the player after updating the position
         } // Update the screen
         SDL_RenderPresent(renderer);
