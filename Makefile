@@ -1,13 +1,13 @@
 CC := clang
-CFLAGS := -o -fsanitize=address
-TARGETS := window
+CFLAGS := -g -fsanitize=address `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
+TARGETS := window 
 
 all: $(TARGETS)
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) /tmp/window-e6827.o
 
-%: %.c
+window: window.c
 	@echo Compiling $<
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) helpers/helpers.c -o window window.c $(CFLAGS) $<
 	@echo

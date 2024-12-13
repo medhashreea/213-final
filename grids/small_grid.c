@@ -479,18 +479,18 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             SDL_RenderClear(renderer);
 
             // Draw the grid
-            draw_dice(renderer, dice_texture);
+            // draw_dice(renderer, dice_texture);
             int start_pos = 0; 
             int end_pos = start_pos + dice_value;
-            move_player(renderer, font, start_pos, end_pos); // render init image
-
+            // move_player(renderer, font, start_pos, end_pos); // render init image
+            // move_player(renderer);
             // for (int i = 1; i <= dice_value + 1; i++)
             // {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
                 SDL_RenderClear(renderer);
-                //small_grid(renderer, font);
-                //draw_dice(renderer, dice_texture);
-                //move_player(renderer, font, 0, 2);
+                small_grid(renderer, font);
+                draw_dice(renderer, dice_texture);
+                move_player(renderer);
             // } // Render the player after updating the position
         } // Update the screen
         SDL_RenderPresent(renderer);
