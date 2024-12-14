@@ -73,51 +73,56 @@ bool snake_or_ladder()
 // int char_end_x = 25;
 // int char_end_y = 0;
 
-void move_player(SDL_Renderer *renderer, int current_pos)
-{
+
+void move_player(SDL_Renderer *renderer, int current_pos) {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
 
-    SDL_Surface *player_surface = IMG_Load("grids/images/character.png"); // Load the character image
-    if (player_surface == NULL)
-    {
+    // Load the character image
+    SDL_Surface *player_surface = IMG_Load("grids/images/character.png");
+    if (player_surface == NULL) {
         printf("Failed to load player image: %s\n", IMG_GetError());
+        return;
     }
     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
-    int margin = 25;                 // margin size
+
+    // Board dimensions and margin
     int rows = 25;
     int cols = 5;
+    int cell_width = SMALL_CELL_WIDTH;
+    int cell_height = SMALL_CELL_HEIGHT;
 
-    // calculate board dimensions
-    int width = (cols * SMALL_CELL_WIDTH);   // 5 cells horizontally
-    int height = (rows * SMALL_CELL_HEIGHT); // 25 rows vertically
+    // Calculate board position
+    int screen_x = (SCREEN_WIDTH - (cols * cell_width)) / 2;   // Center horizontally
+    int screen_y = (SCREEN_HEIGHT - (rows * cell_height)) / 2; // Center vertically
 
-    // calculate board position
-    int screen_x = (SCREEN_WIDTH - width) / 2;   // Center horizontally
-    int screen_y = (SCREEN_HEIGHT - height) / 2; // Center vertically
-
-    // starting cell
-    int char_start_x = 23;
-    int char_start_y = -1 + current_pos;
-    int char_end_x = 25;
-    int char_end_y = 0 + current_pos;
-
-    draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y, char_end_x, char_end_y, screen_x, screen_y, 1, 1, 0);
-}
-
-int update_pos(int dice_value)
-{
-    if (snake_or_ladder())
-    {
-        pos = snake_ladder_pos();
-    }
-    else
-    {
-        pos += dice_value;
+    // Calculate the character's grid position
+    int row = current_pos / cols; // Determine row (integer division)
+    int col;
+    if (row % 2 == 0) {
+        // Even rows: left-to-right
+        col = current_pos % cols;
+    } else {
+        // Odd rows: right-to-left
+        col = cols - 1 - (current_pos % cols);
     }
 
-    return pos;
+    // Calculate the character's pixel position
+    int char_x = screen_x + col * cell_width;
+    int char_y = screen_y + (rows - 1 - row) * cell_height; // Top-to-bottom layout
+
+    // Render the character
+    SDL_Rect character_rect = { char_x, char_y, cell_width, cell_height };
+    SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
+
+    // Present the updated frame
+    SDL_RenderPresent(renderer);
+
+    // Cleanup
+    SDL_DestroyTexture(player_texture);
+    IMG_Quit();
 }
+
 
 /**
  * Places the Snakes and Ladders images
@@ -438,6 +443,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     if (current_pos >= FINAL_POS)
                     {
                         state = win;
+                        move_player(renderer, 121);
                         printf("You win\n");
                     }
                     else
