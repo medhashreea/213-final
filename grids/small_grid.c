@@ -11,7 +11,7 @@
 #define SCREEN_HEIGHT 1000
 #define SMALL_CELL_WIDTH 50  // Width of each cell
 #define SMALL_CELL_HEIGHT 35 // Height of each cell
-#define FINAL_POS 121
+#define FINAL_POS 124
 
 // Global Variables
 typedef enum
@@ -20,13 +20,13 @@ typedef enum
     move,
     win
 } States;
+
 States state = die;
-int pos = 0;
 
 /*
  * Ladder positions on the grid
  */
-int small_ladders[3][2] = {{25, 34}, {63, 74}, {98, 107}};
+int small_ladders[3][2] = {{25, 33}, {63, 74}, {98, 107}};
 
 /*
  * Snake positions on the grid
@@ -37,56 +37,52 @@ int small_snakes[3][2] = {{28, 10}, {62, 43}, {119, 88}};
 /*
  * Returns new position
  */
-int snake_ladder_pos()
+int snake_ladder_pos(int current_pos)
 {
     for (int i = 0; i < 3; i++)
     {
         // Checks if it's a snake
-        if (pos == small_snakes[i][0])
+        if (current_pos == small_snakes[i][0])
         {
-            return small_snakes[i][1];
+            current_pos = small_snakes[i][1];
         }
         // Checks if it's a ladder
-        else if (pos == small_ladders[i][0])
+        else if (current_pos == small_ladders[i][0])
         {
-            return small_ladders[i][1];
+            current_pos = small_ladders[i][1];
         }
     }
-    return pos;
+    return current_pos;
 }
 
 /*
  * Checks if it's a snake or ladder
  */
-bool snake_or_ladder()
+bool snake_or_ladder(int current_pos)
 {
     for (int i = 0; i < 3; i++)
     {
         // Checks if it's a snake
-        return (pos == small_snakes[i][0] || pos == small_ladders[i][0]);
+        return (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0]);
     }
     return false;
 }
 
-// int char_start_x = 23;
-// int char_start_y = -1;
-// int char_end_x = 25;
-// int char_end_y = 0;
+void move_player(SDL_Renderer *renderer, int current_pos)
+{
+    IMG_Init(IMG_INIT_PNG); // init support for PNGs
 
-
-void move_player(SDL_Renderer *renderer, int current_pos) {
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-
-    // Load the character image
+    // load the character image
     SDL_Surface *player_surface = IMG_Load("grids/images/character.png");
-    if (player_surface == NULL) {
+    if (player_surface == NULL)
+    {
         printf("Failed to load player image: %s\n", IMG_GetError());
         return;
     }
     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
 
-    // Board dimensions and margin
+    // Board dimensions
     int rows = 25;
     int cols = 5;
     int cell_width = SMALL_CELL_WIDTH;
@@ -99,11 +95,14 @@ void move_player(SDL_Renderer *renderer, int current_pos) {
     // Calculate the character's grid position
     int row = current_pos / cols; // Determine row (integer division)
     int col;
-    if (row % 2 == 0) {
-        // Even rows: left-to-right
+
+    // if the row is even, increment the character (move right)
+    if (row % 2 == 0)
+    {
         col = current_pos % cols;
-    } else {
-        // Odd rows: right-to-left
+    }
+    else // if the row is odd, decrement character (move left)
+    {
         col = cols - 1 - (current_pos % cols);
     }
 
@@ -112,7 +111,7 @@ void move_player(SDL_Renderer *renderer, int current_pos) {
     int char_y = screen_y + (rows - 1 - row) * cell_height; // Top-to-bottom layout
 
     // Render the character
-    SDL_Rect character_rect = { char_x, char_y, cell_width, cell_height };
+    SDL_Rect character_rect = {char_x, char_y, cell_width, cell_height};
     SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
 
     // Present the updated frame
@@ -122,7 +121,6 @@ void move_player(SDL_Renderer *renderer, int current_pos) {
     SDL_DestroyTexture(player_texture);
     IMG_Quit();
 }
-
 
 /**
  * Places the Snakes and Ladders images
@@ -323,20 +321,20 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
-    srand(time(NULL));
+    srand(time(NULL));      // init to generate random values later
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-    // Main loop flag
+
     int quit = 0;
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
 
-    int dice_value;
-    int cur_dice_step = 0;
-    int current_pos = 0;
+    int dice_value;        // init for dice value
+    int cur_dice_step = 0; // init dice to start counting at 0
+    int current_pos = 0;   // the current cell is pos 0
 
+    // while the user is in the small snakes & ladders window
     while (!quit)
     {
         // Handle events
@@ -344,7 +342,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         {
             if (e.type == SDL_QUIT)
             {
-                quit = 1;
+                quit = 1; // goes back to main window
             }
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
@@ -353,8 +351,6 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                 cur_dice_step = 1;
                 char *dice_choice = dice_paths[dice_value];
                 printf("You rolled a %d \n", dice_value + 1);
-                // printf("die is: %d \n", dice_value + 1);
-
                 // Load the new dice texture
                 SDL_Surface *dice_surface = IMG_Load(dice_choice);
                 if (dice_surface == NULL)
@@ -371,7 +367,11 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
                     SDL_FreeSurface(dice_surface); // Free the surface after creating texture
                 }
-                // for (int i = cur_dice_step; cur_dice_step < dice_value; i++) {
+                state = move;
+            } // Check if left mouse button was clicked
+
+            if (state == move)
+            {
                 while (cur_dice_step <= dice_value + 1)
                 {
                     printf("die step at: %d \n", cur_dice_step);
@@ -379,94 +379,70 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     // Clear the screen and redraw everything
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
                     SDL_RenderClear(renderer);
+                    // if (snake_or_ladder(current_pos))
+                    // {
+                    //     printf("found snake or ladder at %d\n", current_pos);
+                    //     current_pos = snake_ladder_pos(current_pos);
+                    //     printf("landing at %d\n", current_pos);
+                    // }
 
-                    // Redraw the grid
-                    small_grid(renderer, font);
-
-                    // Draw the dice texture
-                    draw_dice(renderer, dice_texture);
-
-                    // Draw the player at the new position
-                    move_player(renderer, current_pos);
-
-                    SDL_Delay(50); // 200 ms delay for smooth movement
-
-                    SDL_RenderPresent(renderer);
-
-                    cur_dice_step++;
-                }
-                state = move;
-                // cur_dice_step++;
-            } // Check if left mouse button was clicked
-
-            // char move, not dealing with images at all!!!
-            if (state == move)
-            {
-                // int pos = update_pos(dice_value);
-                if (cur_dice_step < dice_value)
-                {
-                    current_pos++;
-                    // Clear the screen and redraw everything
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-                    SDL_RenderClear(renderer);
-
-                    // Redraw the grid
-                    small_grid(renderer, font);
-
-                    // Draw the dice texture
-                    draw_dice(renderer, dice_texture);
-
-                    // Draw the player at the new position
-                    move_player(renderer, current_pos);
-
-                    // Delay to create animation effect (adjust the delay time for speed)
-                    SDL_Delay(200); // 200 ms delay for smooth movement
-
-                    SDL_RenderPresent(renderer);
-
-                    cur_dice_step++;
-                    SDL_RenderClear(renderer);
-                    // printf("Moving to position: %d\n", pos);
-                }
-                else
-                {
-                    // After completing the movement
-                    pos = current_pos; // Update global position
-
-                    // Check for snakes or ladders
-                    if (snake_or_ladder())
-                    {
-                        pos = snake_ladder_pos();
-                    }
-
+                    // if ((dice_value + current_pos) > FINAL_POS) {
+                    //     continue;
+                    // }
+                    
                     // Check for win condition
                     if (current_pos >= FINAL_POS)
                     {
-                        state = win;
-                        move_player(renderer, 121);
+                        // state = win;
+                        move_player(renderer, FINAL_POS);
                         printf("You win\n");
-                    }
-                    else
-                    {
-                        state = die; // Back to die state to wait for next roll
+                        break;
                     }
 
-                    cur_dice_step = 0; // Reset step counter for next turn
+                    // Redraw the grid
+                    small_grid(renderer, font);
+
+                    // Draw the dice texture
+                    draw_dice(renderer, dice_texture);
+
+                    // Draw the player at the new position
+                    move_player(renderer, current_pos);
+
+                    SDL_Delay(250); // 200 ms delay for smooth movement
+
+                    SDL_RenderPresent(renderer);
+
+                    cur_dice_step++;
                 }
-            }
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-            SDL_RenderClear(renderer);
-            small_grid(renderer, font);
-            draw_dice(renderer, dice_texture);
-            move_player(renderer, current_pos);
-            SDL_RenderPresent(renderer);
-        }
 
+                // Check for snakes or ladders after player has landed on final cell
+                // if (snake_or_ladder(current_pos))
+                // {
+                //     printf("found snake or ladder at %d\n", current_pos);
+                //     current_pos = snake_ladder_pos(current_pos);
+                //     printf("landing at %d\n", current_pos);
+                // }
+
+                cur_dice_step = 0; // Reset step counter for next turn
+                                   // Check for win condition
+                // if (current_pos >= FINAL_POS)
+                // {
+                //     state = win;
+                //     move_player(renderer, FINAL_POS);
+                //     printf("You win\n");
+                //     // break;
+                // }
+                // else
+                // {
+                    state = die; // Back to die state to wait for next roll
+                // }
+            }
+        }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
         SDL_RenderClear(renderer);
         small_grid(renderer, font);
         draw_dice(renderer, dice_texture);
         move_player(renderer, current_pos);
         SDL_RenderPresent(renderer);
-    } // Update the screen
+    } // While the user is in the small grid game
 }
