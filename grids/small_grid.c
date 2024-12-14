@@ -68,15 +68,12 @@ bool snake_or_ladder()
     return false;
 }
 
-
-
-
 // int char_start_x = 23;
 // int char_start_y = -1;
 // int char_end_x = 25;
 // int char_end_y = 0;
 
-void move_player(SDL_Renderer *renderer)
+void move_player(SDL_Renderer *renderer, int current_pos)
 {
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
 
@@ -87,8 +84,7 @@ void move_player(SDL_Renderer *renderer)
     }
     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
-
-    int margin = 25; // margin size
+    int margin = 25;                 // margin size
     int rows = 25;
     int cols = 5;
 
@@ -102,36 +98,12 @@ void move_player(SDL_Renderer *renderer)
 
     // starting cell
     int char_start_x = 23;
-    int char_start_y = -1;
+    int char_start_y = -1 + current_pos;
     int char_end_x = 25;
-    int char_end_y = 0;
+    int char_end_y = 0 + current_pos;
 
-    // draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y, char_end_x, char_end_y, screen_x, screen_y, 1, 1, 0);
-
-    // loop to add values in each cell
-    for (int row = char_end_x; row >= 0; row--) // loop over all rows first
-    {
-        if ((row % 2) == 0) // check if row is even
-        {
-            for (int col = char_start_y; col < cols; col++) // for columns going left to right, move player right
-            {
-                draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y++, char_end_x, char_end_y++, screen_x, screen_y, 1, 1, 0);
-                //SDL_Delay(500);
-            }
-        }
-        else
-        {
-            for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
-            {
-                draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y--, char_end_x, char_end_y--, screen_x, screen_y, 1, 1, 0);
-                //SDL_Delay(500);
-            } // column loop
-        } // cond check for odd/even rows
-    } // row loop
+    draw_img(renderer, player_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, char_start_x, char_start_y, char_end_x, char_end_y, screen_x, screen_y, 1, 1, 0);
 }
-
-
-
 
 int update_pos(int dice_value)
 {
@@ -347,52 +319,6 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 } // small_grid
 
 
-// void move_player(SDL_Renderer *renderer, TTF_Font *font, int cur_pos, int end_pos) {
-//     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-
-//     // Load character PNG
-//     SDL_Surface *player_surface = IMG_Load("grids/images/character.png");
-//     if (player_surface == NULL) {
-//         printf("Failed to load player image: %s\n", IMG_GetError());
-//         return;
-//     }
-//     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
-//     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
-
-//     // Character position and size
-//     SDL_Rect character_rect;
-//     character_rect.w = SMALL_CELL_WIDTH;   // Set width
-//     character_rect.h = SMALL_CELL_HEIGHT; // Set height
-
-//     // Starting position
-//     character_rect.x = cur_pos;
-//     character_rect.y = SCREEN_HEIGHT - character_rect.h;
-
-//     // Animate character movement
-//     for (int pos = cur_pos; pos <= end_pos; pos++) {
-//         // Clear screen
-//         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-//         SDL_RenderClear(renderer);
-
-//         // Update character position
-//         character_rect.x += pos; // Move 10 pixels to the right per step
-//         character_rect.y -= pos; // Move 5 pixels up per step
-
-//         // Render the character at the new position
-//         SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
-
-//         small_grid(renderer, font);
-//         // Present updated frame
-//         SDL_RenderPresent(renderer);
-
-//         // Delay to make the movement visible
-//         SDL_Delay(100); // 100 ms delay between frames
-//     }
-
-//     // Cleanup
-//     SDL_DestroyTexture(player_texture);
-// }
-
 void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 {
     srand(time(NULL));
@@ -402,8 +328,9 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
 
-    int cur_dice_step;
     int dice_value;
+    int cur_dice_step = 0;
+    int current_pos = 0;
 
     while (!quit)
     {
@@ -440,59 +367,100 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                     SDL_FreeSurface(dice_surface); // Free the surface after creating texture
                 }
                 // for (int i = cur_dice_step; cur_dice_step < dice_value; i++) {
-                while (cur_dice_step <= dice_value + 1) {
-                  printf("die step at: %d \n", cur_dice_step);
-                  cur_dice_step++;
+                while (cur_dice_step <= dice_value + 1)
+                {
+                    printf("die step at: %d \n", cur_dice_step);
+                    current_pos++;
+                    // Clear the screen and redraw everything
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+                    SDL_RenderClear(renderer);
+
+                    // Redraw the grid
+                    small_grid(renderer, font);
+
+                    // Draw the dice texture
+                    draw_dice(renderer, dice_texture);
+
+                    // Draw the player at the new position
+                    move_player(renderer, current_pos);
+
+                    SDL_Delay(50); // 200 ms delay for smooth movement
+
+                    SDL_RenderPresent(renderer);
+
+                    cur_dice_step++;
                 }
                 state = move;
-                //cur_dice_step++;
+                // cur_dice_step++;
             } // Check if left mouse button was clicked
 
             // char move, not dealing with images at all!!!
             if (state == move)
             {
-                // want func to draw at each frame (have to do one step) (use counter as position and move it each time)
-                // at end we want to move player to final state
-                int pos = update_pos(dice_value);
-                if (cur_dice_step < dice_value) {
-                    pos++;
-                    cur_dice_step++;
-                    printf("Moving to position: %d\n", pos);
-                }
-                // move_player(renderer, player_texture);
-                // final_pos_player();
-                if (pos >= FINAL_POS)
+                // int pos = update_pos(dice_value);
+                if (cur_dice_step < dice_value)
                 {
-                    state = win;
-                    printf("You win\n");
+                    current_pos++;
+                    // Clear the screen and redraw everything
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+                    SDL_RenderClear(renderer);
+
+                    // Redraw the grid
+                    small_grid(renderer, font);
+
+                    // Draw the dice texture
+                    draw_dice(renderer, dice_texture);
+
+                    // Draw the player at the new position
+                    move_player(renderer, current_pos);
+
+                    // Delay to create animation effect (adjust the delay time for speed)
+                    SDL_Delay(200); // 200 ms delay for smooth movement
+
+                    SDL_RenderPresent(renderer);
+
+                    cur_dice_step++;
+                    SDL_RenderClear(renderer);
+                    // printf("Moving to position: %d\n", pos);
                 }
-                else {
-                state = die;
-                }
-                
-                if (cur_dice_step == dice_value) {
-                SDL_RenderPresent(renderer);
+                else
+                {
+                    // After completing the movement
+                    pos = current_pos; // Update global position
+
+                    // Check for snakes or ladders
+                    if (snake_or_ladder())
+                    {
+                        pos = snake_ladder_pos();
+                    }
+
+                    // Check for win condition
+                    if (current_pos >= FINAL_POS)
+                    {
+                        state = win;
+                        printf("You win\n");
+                    }
+                    else
+                    {
+                        state = die; // Back to die state to wait for next roll
+                    }
+
+                    cur_dice_step = 0; // Reset step counter for next turn
                 }
             }
-
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
             SDL_RenderClear(renderer);
+            small_grid(renderer, font);
+            draw_dice(renderer, dice_texture);
+            move_player(renderer, current_pos);
+            SDL_RenderPresent(renderer);
+        }
 
-            // Draw the grid
-            // draw_dice(renderer, dice_texture);
-            int start_pos = 0; 
-            int end_pos = start_pos + dice_value;
-            // move_player(renderer, font, start_pos, end_pos); // render init image
-            // move_player(renderer);
-            // for (int i = 1; i <= dice_value + 1; i++)
-            // {
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-                SDL_RenderClear(renderer);
-                small_grid(renderer, font);
-                draw_dice(renderer, dice_texture);
-                move_player(renderer);
-            // } // Render the player after updating the position
-        } // Update the screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+        SDL_RenderClear(renderer);
+        small_grid(renderer, font);
+        draw_dice(renderer, dice_texture);
+        move_player(renderer, current_pos);
         SDL_RenderPresent(renderer);
-    }
+    } // Update the screen
 }
