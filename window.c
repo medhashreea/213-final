@@ -14,6 +14,12 @@
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 
+
+
+  pthread_t threads[4];
+  size_t character_ids[4];
+  
+
 typedef struct
 {
     SDL_Rect rect;   // Position and size of the button
