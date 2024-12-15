@@ -96,10 +96,6 @@ void move_player(SDL_Renderer *renderer, int current_pos)
     int row = current_pos / cols; // Determine row (integer division)
     int col;
 
-    //if (snake_or_ladder(current_pos)) {
-        //current_pos = snake_ladder_pos(current_pos); 
-    //}
-
     // if the row is even, increment the character (move right)
     if (row % 2 == 0)
     {
@@ -336,6 +332,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
 
     int dice_value;        // init for dice value
     int cur_dice_step = 0; // init dice to start counting at 0
+    int prev_pos = 0;
     int current_pos = 0;   // the current cell is pos 0
 
     
@@ -382,17 +379,27 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
                 while (cur_dice_step <= dice_value + 1)
                 {
                     printf("die step at: %d \n", cur_dice_step);
-                //if (snake_or_ladder(current_pos)) {
-                    //current_pos = snake_ladder_pos(current_pos); 
-                //}
-                //else {
+                    prev_pos = current_pos;
                     current_pos++;
-                    //current_pos = snake_ladder_pos(current_pos); 
+                if (snake_or_ladder(current_pos) && (prev_pos + dice_value == current_pos)) {
+                    current_pos = snake_ladder_pos(current_pos); 
+    
+                //else {
+                    // current_pos++;
+                    // current_pos = snake_ladder_pos(current_pos); 
 
                 //}
                     // Clear the screen and redraw everything
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
                     SDL_RenderClear(renderer);
+                    small_grid(renderer, font);
+                    move_player(renderer, current_pos);
+                    SDL_Delay(250);
+                    break;
+                }
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderClear(renderer);
                     // if (snake_or_ladder(current_pos))
                     // {
                     //     printf("found snake or ladder at %d\n", current_pos);
@@ -465,7 +472,6 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
         if (game_won) {
                 //move_player(renderer, 125);
                 //SDL_Delay(500);
-                break;
                 break;
                 }
     } // While the user is in the small grid game
