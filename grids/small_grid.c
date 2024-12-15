@@ -73,13 +73,26 @@ void move_player(SDL_Renderer *renderer, int current_pos)
 
     // load the character image
     SDL_Surface *player_surface = IMG_Load("grids/images/character.png");
-    if (player_surface == NULL)
+    SDL_Surface *player_surface2 = IMG_Load("grids/images/character2.png");
+    SDL_Surface *player_surface3 = IMG_Load("grids/images/character3.png");
+    SDL_Surface *player_surface4 = IMG_Load("grids/images/character4.png");
+
+    if (player_surface == NULL || player_surface2 == NULL || player_surface3 == NULL || player_surface4 == NULL)
     {
         printf("Failed to load player image: %s\n", IMG_GetError());
         return;
     }
     SDL_Texture *player_texture = SDL_CreateTextureFromSurface(renderer, player_surface);
+    SDL_Texture *player_texture2 = SDL_CreateTextureFromSurface(renderer, player_surface2);
+    SDL_Texture *player_texture3 = SDL_CreateTextureFromSurface(renderer, player_surface3);
+    SDL_Texture *player_texture4 = SDL_CreateTextureFromSurface(renderer, player_surface4);
+
     SDL_FreeSurface(player_surface); // Free the surface after creating the texture
+    SDL_FreeSurface(player_surface2);
+    SDL_FreeSurface(player_surface3);
+    SDL_FreeSurface(player_surface4);
+
+    
 
     // Board dimensions
     int rows = 25;
@@ -112,12 +125,18 @@ void move_player(SDL_Renderer *renderer, int current_pos)
     // Render the character
     SDL_Rect character_rect = {char_x, char_y, cell_width, cell_height};
     SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
+    SDL_RenderCopy(renderer, player_texture2, NULL, &character_rect);
+    SDL_RenderCopy(renderer, player_texture3, NULL, &character_rect);
+    SDL_RenderCopy(renderer, player_texture4, NULL, &character_rect);
 
     // Present the updated frame
     SDL_RenderPresent(renderer);
 
     // Cleanup
     SDL_DestroyTexture(player_texture);
+    SDL_DestroyTexture(player_texture2);
+    SDL_DestroyTexture(player_texture3);
+    SDL_DestroyTexture(player_texture4);
     IMG_Quit();
 }
 
@@ -320,7 +339,7 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
+void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
     srand(time(NULL));      // init to generate random values later
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
@@ -348,6 +367,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font)
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
                 // Generate a random dice value and choose the corresponding texture
+                printf("num players = %d", num_players);
                 dice_value = rand() % 6;
                 cur_dice_step = 1;
                 char *dice_choice = dice_paths[dice_value];
