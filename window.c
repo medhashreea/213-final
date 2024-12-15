@@ -271,12 +271,19 @@ int main(int argc, char **argv)
             }
             else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
+                int num_players = atoi(num_player); // convert char num to integer
+
+                if (num_players == 0)
+                {
+                    num_players = 1;
+                } // default num player to 1 player
+
                 SDL_Point mousePos;
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
                 if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Small Game");       // change window name
-                    small_grid_game(renderer, font, num_player);    // Call small game
+                    small_grid_game(renderer, font, num_players);    // Call small game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
                 else if (SDL_PointInRect(&mousePos, &medium_board.rect))

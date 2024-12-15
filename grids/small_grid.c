@@ -337,9 +337,9 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, char *num_p)
+void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
-    int num_players = atoi(num_p); // convert char num to integer
+    // int num_players = atoi(num_p); // convert char num to integer
     srand(time(NULL));             // init to generate random values later
     IMG_Init(IMG_INIT_PNG);        // Initialize support for PNGs
 
