@@ -9,16 +9,12 @@
 #include "grids/medium_grid.c"
 #include "grids/large_grid.c"
 
-
 // Macros
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 
-
-
-  pthread_t threads[4];
-  size_t character_ids[4];
-  
+pthread_t threads[4];
+size_t character_ids[4];
 
 typedef struct
 {
@@ -222,7 +218,7 @@ int main(int argc, char **argv)
 
     // Add an entry box for the number of players
     SDL_Rect entry_box = {SCREEN_WIDTH / 2 - 100, 300, 200, 50};
-    char num_player[3] = ""; // To hold the number of players as a string
+    char num_player[2] = ""; // To hold the number of players as a string
     int num_length = 0;      // Length of current input
 
     // Entry box color
@@ -241,7 +237,7 @@ int main(int argc, char **argv)
             {
                 if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_4 && num_length < 1) // only takes first number input
                 {
-                    // Add the key to num_player if within valid range (1-5)
+                    // Add the key to num_player if within valid range (1-4)
                     num_player[num_length++] = e.key.keysym.sym - SDLK_0 + '0'; // Convert int to char
                     num_player[num_length] = '\0';                              // Null-terminate the string
                 }
@@ -280,7 +276,7 @@ int main(int argc, char **argv)
                 if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Small Game");       // change window name
-                    small_grid_game(renderer, font);                // Call small game
+                    small_grid_game(renderer, font, num_player);    // Call small game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
                 else if (SDL_PointInRect(&mousePos, &medium_board.rect))

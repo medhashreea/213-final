@@ -92,8 +92,6 @@ void move_player(SDL_Renderer *renderer, int current_pos)
     SDL_FreeSurface(player_surface3);
     SDL_FreeSurface(player_surface4);
 
-    
-
     // Board dimensions
     int rows = 25;
     int cols = 5;
@@ -339,10 +337,11 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
+void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, char *num_p)
 {
-    srand(time(NULL));      // init to generate random values later
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+    int num_players = atoi(num_p); // convert char num to integer
+    srand(time(NULL));             // init to generate random values later
+    IMG_Init(IMG_INIT_PNG);        // Initialize support for PNGs
 
     int quit = 0;
     SDL_Event e;
@@ -367,7 +366,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
                 // Generate a random dice value and choose the corresponding texture
-                printf("num players = %d", num_players);
+                printf("num players = %d\n", num_players);
                 dice_value = rand() % 6;
                 cur_dice_step = 1;
                 char *dice_choice = dice_paths[dice_value];
@@ -489,12 +488,10 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 printf("Failed to create ladder texture: %s\n", SDL_GetError());
                 return;
             }
-            // SDL_RenderPresent(renderer);
+
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
             SDL_RenderClear(renderer);
             small_grid(renderer, font);
-            // draw_dice(renderer, dice_texture);
-            // move_player(renderer, current_pos);
             draw_img(renderer, winner_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, 10, -1, 20, 3, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 1, 0);
             SDL_RenderPresent(renderer);
             SDL_Delay(1000); // delay for smooth movement
