@@ -286,7 +286,7 @@ void large_grid(SDL_Renderer *renderer, TTF_Font *font)
     place_large_imgs(renderer, screen_x, screen_y);
 } // large_grid
 
-void large_grid_game(SDL_Renderer *renderer, TTF_Font *font)
+void large_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
     // // Initialize SDL
     // if (SDL_Init(SDL_INIT_VIDEO) < 0)

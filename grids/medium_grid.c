@@ -278,7 +278,7 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
     place_medium_imgs(renderer, screen_x, screen_y);
 } // medium_grid
 
-void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font)
+void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
     // // Initialize SDL
     // if (SDL_Init(SDL_INIT_VIDEO) < 0)
