@@ -281,9 +281,9 @@ int main(int argc, char **argv)
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
                 if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
-                    SDL_SetWindowTitle(window, "Small Game");                             // change window name
-                    small_grid_game(renderer, font, num_players); // Call small game
-                    SDL_SetWindowTitle(window, "Snakes & Ladders");                       // change window name back
+                    SDL_SetWindowTitle(window, "Small Game");       // change window name
+                    small_grid_game(renderer, font, num_players);   // Call small game
+                    SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
                 else if (SDL_PointInRect(&mousePos, &medium_board.rect))
                 {

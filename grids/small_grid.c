@@ -358,9 +358,6 @@ void *player_thread(void *p)
 {
     player_t *player = (player_t *)p; // Cast the argument to player_t
 
-    srand(time(NULL));      // init to generate random values later
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-
     int quit = 0;
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
@@ -425,6 +422,7 @@ void *player_thread(void *p)
                         // state = win;
                         small_grid(player->renderer, player->font);
                         move_player(player->renderer, FINAL_POS);
+                        state = win;
                         SDL_Delay(250);
                         printf("You win\n");
                         game_won = true;
