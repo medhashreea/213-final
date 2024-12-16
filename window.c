@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
 #include "helpers/helpers.h"
+#include <pthread.h>
 
 #include "grids/small_grid.c"
 #include "grids/medium_grid.c"
@@ -14,7 +15,48 @@
 #define SCREEN_HEIGHT 1000
 
 pthread_t threads[4];
-size_t character_ids[4];
+
+// make struct with renderer, cur_position, and each image corresponding to each thread manually rt (cur image)
+
+typedef struct player {
+    SDL_Renderer *renderer;
+    int cur_position; 
+    SDL_Texture *player_texture;
+} player_t;
+
+// make struct that holds arguments
+pthread_t* char_threads_array[4];
+
+
+// void make_threads() {
+// for (int i = 0; i < 4; i++) {
+//     // Creates thread
+//     if (pthread_create(&threads[i], NULL, move_player(player_t -> renderer, player_t-> cur_position), &char_threads_array[i])) {
+//         perror("pthread_create failed");
+//         exit(2);
+//     }
+//     // Waits for thread 
+//     if (pthread_join(threads[i], NULL)) {
+//         perror("pthread_join failed");
+//         exit(2);
+//         }
+//     }
+// }
+
+
+
+
+
+// malloc(sizeof);
+
+// create threads, wait threads, synchronize
+
+
+// create, wait, synchgrnoize
+
+//struct character_array[4];
+
+//
 
 typedef struct
 {
