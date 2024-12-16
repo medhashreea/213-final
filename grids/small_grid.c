@@ -26,13 +26,13 @@ States state = die;
 /*
  * Ladder positions on the grid
  */
-int small_ladders[3][2] = {{25, 33}, {62, 73}, {97, 106}};
+int small_ladders[3][2] = {{24, 33}, {62, 73}, {97, 106}};
 
 /*
  * Snake positions on the grid
  */
 
-int small_snakes[3][2] = {{28, 9}, {61, 42}, {118, 87}};
+int small_snakes[3][2] = {{27, 9}, {61, 42}, {118, 87}};
 
 /*
  * Returns new position
@@ -45,11 +45,13 @@ int snake_ladder_pos(int current_pos)
         if (current_pos == small_snakes[i][0])
         {
             current_pos = small_snakes[i][1];
+            break;
         }
         // Checks if it's a ladder
         else if (current_pos == small_ladders[i][0])
         {
             current_pos = small_ladders[i][1];
+            break;
         }
     }
     return current_pos;
@@ -62,7 +64,9 @@ bool snake_or_ladder(int current_pos)
 {
     for (int i = 0; i < 3; i++)
     {
-        return (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0]);
+        if (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0]) {
+            return true;
+        }
     }
     return false;
 }
