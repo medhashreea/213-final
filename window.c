@@ -14,33 +14,22 @@
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 
-pthread_t threads[4];
-
-// make struct with renderer, cur_position, and each image corresponding to each thread manually
-
-typedef struct player
-{
-    SDL_Renderer *renderer;
-    int cur_position;
-    SDL_Texture *player_texture;
-} player_t;
-
-// make struct that holds arguments
-pthread_t *char_threads_array[4];
-
 // void make_threads() {
-// for (int i = 0; i < 4; i++) {
+// for (int i = 0; i < 4; i++)
+// {
 //     // Creates thread
-//     if (pthread_create(&threads[i], NULL, move_player(player_t -> renderer, player_t-> cur_position), &char_threads_array[i])) {
+//     if (pthread_create(&threads[i], NULL, move_player(player_t->renderer, player_t->cur_position), &char_threads_array[i]))
+//     {
 //         perror("pthread_create failed");
 //         exit(2);
 //     }
 //     // Waits for thread
-//     if (pthread_join(threads[i], NULL)) {
+//     if (pthread_join(threads[i], NULL))
+//     {
 //         perror("pthread_join failed");
 //         exit(2);
-//         }
 //     }
+// }
 // }
 
 // malloc(sizeof);
@@ -51,32 +40,25 @@ pthread_t *char_threads_array[4];
 
 // struct character_array[4];
 
-//
+// pthread_t threads[4];
 
+// make struct with renderer, cur_position, and each image corresponding to each thread manually
+
+// data struct to hold player information
+// typedef struct player
+// {
+//     // SDL_Renderer *renderer;
+//     SDL_Texture *player_texture;
+//     int cur_position;
+// } player_t;
+
+// data struct to hold butoon information
 typedef struct
 {
     SDL_Rect rect;   // Position and size of the button
     SDL_Color color; // Color of the button
     char *label;
 } Button;
-/**
- * GRAPHICS TODO (25x5, 50x10, 100x50) - each grid is different file
- * 1. build grid
- * 2. add the numbers
- * 3. add the snakes and ladders
- * 4. add the players (threading - thread for each player, thread synch moves)
- * 5. generate dice (1-6)
- * 6. move players around based dice value (scheduling)
- *
- * AFTER basic graphics
- * 1. create opening window/screen choices (grid choice & # of player choice)
- * 2. based on selection, change window/screen to respective grid with respective number of players
- * 3. play game
- * 4. closing rank window/screen
- *
- * IF FINISH EARLY
- * 1. add networking >_<
- */
 
 void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *text, int x, int y)
 {
@@ -144,26 +126,6 @@ void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Bu
     SDL_Color title_color = {255, 0, 255, 255};
     TTF_Font *title_font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 48);
     render_text(renderer, title_font, title_color, title, title_x - 100, title_y);
-    // // Set button positions at the bottom of the screen
-    // int button_margin = 20; // Space between buttons and screen edges
-    // int button_width = 200;
-    // int button_height = 50;
-
-    // // Center buttons at the bottom of the screen
-    // small_board.rect.x = (SCREEN_WIDTH - 3 * button_width - 2 * button_margin) / 2;
-    // small_board.rect.y = SCREEN_HEIGHT - button_height - button_margin;
-    // small_board.rect.w = button_width;
-    // small_board.rect.h = button_height;
-
-    // medium_board.rect.x = small_board.rect.x + button_width + button_margin;
-    // medium_board.rect.y = small_board.rect.y;
-    // medium_board.rect.w = button_width;
-    // medium_board.rect.h = button_height;
-
-    // large_board.rect.x = medium_board.rect.x + button_width + button_margin;
-    // large_board.rect.y = small_board.rect.y;
-    // large_board.rect.w = button_width;
-    // large_board.rect.h = button_height;
 
     // Draw the small board button
     SDL_SetRenderDrawColor(renderer, small_board.color.r, small_board.color.g, small_board.color.b, small_board.color.a);
@@ -319,20 +281,20 @@ int main(int argc, char **argv)
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
                 if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
-                    SDL_SetWindowTitle(window, "Small Game");       // change window name
-                    small_grid_game(renderer, font, num_players);   // Call small game
-                    SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
+                    SDL_SetWindowTitle(window, "Small Game");                             // change window name
+                    small_grid_game(renderer, font, num_players); // Call small game
+                    SDL_SetWindowTitle(window, "Snakes & Ladders");                       // change window name back
                 }
                 else if (SDL_PointInRect(&mousePos, &medium_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Medium Game");      // change window name
-                    medium_grid_game(renderer, font, num_players);               // Call medium game
+                    medium_grid_game(renderer, font, num_players);  // Call medium game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
                 else if (SDL_PointInRect(&mousePos, &large_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Large Game");       // change window name
-                    large_grid_game(renderer, font, num_players);                // Call large game
+                    large_grid_game(renderer, font, num_players);   // Call large game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 }
             }

@@ -13,6 +13,18 @@
 #define SMALL_CELL_HEIGHT 35 // Height of each cell
 #define FINAL_POS 124
 
+pthread_mutex_t dice_mutex = PTHREAD_MUTEX_INITIALIZER; // Mutex for dice roll synchronization
+char *player_imgs[4] = {"grids/images/character.png", "grids/images/character2.png", "grids/images/character3.png", "grids/images/character4.png"};
+
+// data struct to hold player information
+typedef struct player
+{
+    SDL_Renderer *renderer;
+    TTF_Font *font;
+    SDL_Texture *player_texture;
+    int cur_position;
+} player_t;
+
 // Global Variables
 typedef enum
 {
@@ -64,7 +76,8 @@ bool snake_or_ladder(int current_pos)
 {
     for (int i = 0; i < 3; i++)
     {
-        if (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0]) {
+        if (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0])
+        {
             return true;
         }
     }
@@ -341,11 +354,12 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 } // small_grid
 
-void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
+void *player_thread(void *p)
 {
-    // int num_players = atoi(num_p); // convert char num to integer
-    srand(time(NULL));             // init to generate random values later
-    IMG_Init(IMG_INIT_PNG);        // Initialize support for PNGs
+    player_t *player = (player_t *)p; // Cast the argument to player_t
+
+    srand(time(NULL));      // init to generate random values later
+    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
 
     int quit = 0;
     SDL_Event e;
@@ -353,8 +367,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 
     int dice_value;        // init for dice value
     int cur_dice_step = 0; // init dice to start counting at 0
-    int prev_pos = 0;
-    int current_pos = 0; // the current cell is pos 0
+    int current_pos = 0;   // the current cell is pos 0
 
     // while the user is in the small snakes & ladders window
     bool game_won = false;
@@ -370,7 +383,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
             else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
             {
                 // Generate a random dice value and choose the corresponding texture
-                printf("num players = %d\n", num_players);
+                // printf("num players = %d\n", num_players);
                 dice_value = rand() % 6;
                 cur_dice_step = 1;
                 char *dice_choice = dice_paths[dice_value];
@@ -388,7 +401,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                     {
                         SDL_DestroyTexture(dice_texture); // Clean up the previous texture
                     }
-                    dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
+                    dice_texture = SDL_CreateTextureFromSurface(player->renderer, dice_surface);
                     SDL_FreeSurface(dice_surface); // Free the surface after creating texture
                 }
                 state = move;
@@ -403,40 +416,33 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                     current_pos++;
                     printf("current pos: %d\n", current_pos);
 
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                    SDL_RenderClear(renderer);
-                    // if (snake_or_ladder(current_pos))
-                    // {
-                    //     printf("found snake or ladder at %d\n", current_pos);
-                    //     current_pos = snake_ladder_pos(current_pos);
-                    //     printf("landing at %d\n", current_pos);
-                    // }
+                    SDL_SetRenderDrawColor(player->renderer, 0, 0, 0, 255);
+                    SDL_RenderClear(player->renderer);
 
                     // Check for win condition
                     if (current_pos >= FINAL_POS)
                     {
                         // state = win;
-                        small_grid(renderer, font);
-                        move_player(renderer, FINAL_POS);
+                        small_grid(player->renderer, player->font);
+                        move_player(player->renderer, FINAL_POS);
                         SDL_Delay(250);
                         printf("You win\n");
                         game_won = true;
-                        // prob want an end game screen here as well
                         break;
                     }
 
                     // Redraw the grid
-                    small_grid(renderer, font);
+                    small_grid(player->renderer, player->font);
 
                     // Draw the dice texture
-                    draw_dice(renderer, dice_texture);
+                    draw_dice(player->renderer, dice_texture);
 
                     // Draw the player at the new position
-                    move_player(renderer, current_pos);
+                    move_player(player->renderer, current_pos);
 
                     SDL_Delay(250); // 200 ms delay for smooth movement
 
-                    SDL_RenderPresent(renderer);
+                    SDL_RenderPresent(player->renderer);
 
                     cur_dice_step++;
                 }
@@ -453,7 +459,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 // if (current_pos >= FINAL_POS)
                 // {
                 //     state = win;
-                //     move_player(renderer, FINAL_POS);
+                //     move_player(player->renderer, FINAL_POS);
                 //     printf("You win\n");
                 //     // break;
                 // }
@@ -464,42 +470,221 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 // }
             }
         }
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-        SDL_RenderClear(renderer);
-        small_grid(renderer, font);
-        draw_dice(renderer, dice_texture);
-        move_player(renderer, current_pos);
-        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(player->renderer, 0, 0, 0, 255); // Black background
+        SDL_RenderClear(player->renderer);
+        small_grid(player->renderer, player->font);
+        draw_dice(player->renderer, dice_texture);
+        move_player(player->renderer, current_pos);
+        SDL_RenderPresent(player->renderer);
 
         if (game_won)
         {
-            SDL_RenderClear(renderer);
+            SDL_RenderClear(player->renderer);
             SDL_Surface *winner = IMG_Load("grids/images/winner.png"); // Load your PNG image
 
             if (winner == NULL)
             {
                 printf("Failed to load ladder image: %s\n", IMG_GetError());
-                return;
+                return 0;
             }
 
             // Init all ladders (SDL_Texture)
-            SDL_Texture *winner_texture = SDL_CreateTextureFromSurface(renderer, winner);
+            SDL_Texture *winner_texture = SDL_CreateTextureFromSurface(player->renderer, winner);
 
             SDL_FreeSurface(winner);
 
             if (winner_texture == NULL) // failure check
             {
                 printf("Failed to create ladder texture: %s\n", SDL_GetError());
-                return;
+                return 0;
             }
 
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
-            SDL_RenderClear(renderer);
-            small_grid(renderer, font);
-            draw_img(renderer, winner_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, 10, -1, 20, 3, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 1, 0);
-            SDL_RenderPresent(renderer);
+            SDL_SetRenderDrawColor(player->renderer, 0, 0, 0, 255); // Black background
+            SDL_RenderClear(player->renderer);
+            small_grid(player->renderer, player->font);
+            draw_img(player->renderer, winner_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, 10, -1, 20, 3, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 1, 0);
+            SDL_RenderPresent(player->renderer);
             SDL_Delay(1000); // delay for smooth movement
             break;
         }
     } // While the user is in the small grid game
+    return 0;
+}
+
+void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
+{
+    pthread_t threads[num_players];      // init threads of num_players
+    player_t players_array[num_players]; // init data struct of num_players
+
+    // unlock thread, player rolls, player moves, lock thread, sync thread with others
+    // thread creation
+    for (int i = 0; i < num_players; i++)
+    {
+        players_array[i].renderer = renderer;
+        players_array[i].font = font;
+        players_array[i].cur_position = 0;      // Initialize each player's position
+        players_array[i].player_texture = NULL; // Initialize texture (you can load textures later)
+        // Create a new thread for each player
+        if (pthread_create(&threads[i], NULL, player_thread, &players_array[i]))
+        {
+            printf("Failed to create thread for player %d\n", i + 1);
+            return;
+        }
+    }
+    // srand(time(NULL));      // init to generate random values later
+    // IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+
+    // int quit = 0;
+    // SDL_Event e;
+    // SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
+
+    // int dice_value;        // init for dice value
+    // int cur_dice_step = 0; // init dice to start counting at 0
+    // int current_pos = 0;   // the current cell is pos 0
+
+    // // while the user is in the small snakes & ladders window
+    // bool game_won = false;
+    // while (!quit)
+    // {
+    //     // Handle events
+    //     while (SDL_PollEvent(&e) != 0)
+    //     {
+    //         if (e.type == SDL_QUIT)
+    //         {
+    //             quit = 1; // goes back to main window
+    //         }
+    //         else if ((e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == SDL_BUTTON_LEFT) && (state == die))
+    //         {
+    //             // Generate a random dice value and choose the corresponding texture
+    //             printf("num players = %d\n", num_players);
+    //             dice_value = rand() % 6;
+    //             cur_dice_step = 1;
+    //             char *dice_choice = dice_paths[dice_value];
+    //             printf("You rolled a %d \n", dice_value + 1);
+    //             // Load the new dice texture
+    //             SDL_Surface *dice_surface = IMG_Load(dice_choice);
+    //             if (dice_surface == NULL)
+    //             {
+    //                 printf("Failed to load dice image: %s\n", IMG_GetError());
+    //             }
+    //             else
+    //             {
+    //                 // Create the texture from the loaded surface
+    //                 if (dice_texture != NULL)
+    //                 {
+    //                     SDL_DestroyTexture(dice_texture); // Clean up the previous texture
+    //                 }
+    //                 dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
+    //                 SDL_FreeSurface(dice_surface); // Free the surface after creating texture
+    //             }
+    //             state = move;
+    //         } // Check if left mouse button was clicked
+
+    //         if (state == move)
+    //         {
+    //             while (cur_dice_step <= dice_value + 1)
+    //             {
+    //                 printf("die step at: %d \n", cur_dice_step);
+    //                 // prev_pos = current_pos;
+    //                 current_pos++;
+    //                 printf("current pos: %d\n", current_pos);
+
+    //                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //                 SDL_RenderClear(renderer);
+
+    //                 // Check for win condition
+    //                 if (current_pos >= FINAL_POS)
+    //                 {
+    //                     // state = win;
+    //                     small_grid(renderer, font);
+    //                     move_player(renderer, FINAL_POS);
+    //                     SDL_Delay(250);
+    //                     printf("You win\n");
+    //                     game_won = true;
+    //                     break;
+    //                 }
+
+    //                 // Redraw the grid
+    //                 small_grid(renderer, font);
+
+    //                 // Draw the dice texture
+    //                 draw_dice(renderer, dice_texture);
+
+    //                 // Draw the player at the new position
+    //                 move_player(renderer, current_pos);
+
+    //                 SDL_Delay(250); // 200 ms delay for smooth movement
+
+    //                 SDL_RenderPresent(renderer);
+
+    //                 cur_dice_step++;
+    //             }
+
+    //             // Check for snakes or ladders after player has landed on final cell
+    //             if (snake_or_ladder(current_pos))
+    //             {
+    //                 printf("found snake or ladder at %d\n", current_pos);
+    //                 current_pos = snake_ladder_pos(current_pos);
+    //                 printf("landing at %d\n", current_pos);
+    //             }
+
+    //             // Check for win condition
+    //             // if (current_pos >= FINAL_POS)
+    //             // {
+    //             //     state = win;
+    //             //     move_player(renderer, FINAL_POS);
+    //             //     printf("You win\n");
+    //             //     // break;
+    //             // }
+    //             // else
+    //             // {
+    //             cur_dice_step = 0; // Reset step counter for next turn
+    //             state = die;       // Back to die state to wait for next roll
+    //             // }
+    //         }
+    //     }
+    //     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+    //     SDL_RenderClear(renderer);
+    //     small_grid(renderer, font);
+    //     draw_dice(renderer, dice_texture);
+    //     move_player(renderer, current_pos);
+    //     SDL_RenderPresent(renderer);
+
+    //     if (game_won)
+    //     {
+    //         SDL_RenderClear(renderer);
+    //         SDL_Surface *winner = IMG_Load("grids/images/winner.png"); // Load your PNG image
+
+    //         if (winner == NULL)
+    //         {
+    //             printf("Failed to load ladder image: %s\n", IMG_GetError());
+    //             return;
+    //         }
+
+    //         // Init all ladders (SDL_Texture)
+    //         SDL_Texture *winner_texture = SDL_CreateTextureFromSurface(renderer, winner);
+
+    //         SDL_FreeSurface(winner);
+
+    //         if (winner_texture == NULL) // failure check
+    //         {
+    //             printf("Failed to create ladder texture: %s\n", SDL_GetError());
+    //             return;
+    //         }
+
+    //         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
+    //         SDL_RenderClear(renderer);
+    //         small_grid(renderer, font);
+    //         draw_img(renderer, winner_texture, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, 10, -1, 20, 3, SCREEN_WIDTH, SCREEN_HEIGHT, 1, 1, 0);
+    //         SDL_RenderPresent(renderer);
+    //         SDL_Delay(1000); // delay for smooth movement
+    //         break;
+    //     }
+    // } // While the user is in the small grid game
+
+    // Wait for all threads to finish --- maybe goes at end of this function
+    for (int i = 0; i < num_players; i++)
+    {
+        pthread_join(threads[i], NULL);
+    }
 }

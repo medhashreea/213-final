@@ -49,10 +49,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     int dice_value = rand() % 6;
     dice_choice = dice_paths[dice_value];
 
-    // // // init dice
-    // char* dice_chose = roll_dice(renderer);
-    // SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
-
     // Init all ladders (SDL_Surface)
     SDL_Surface *ladder = IMG_Load("grids/images/ladder.png");   // Load your PNG image
     SDL_Surface *ladder2 = IMG_Load("grids/images/ladder2.png"); // Load your PNG image
@@ -66,13 +62,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Surface *snake4 = IMG_Load("grids/images/snake4.png"); // Load your PNG image
     SDL_Surface *snake5 = IMG_Load("grids/images/snake6.png"); // Load your PNG image
 
-    // // // failure check
-    // if (dice == NULL)
-    // {
-    //     printf("Failed to load dice: %s\n", IMG_GetError());
-    //     return;
-    // }
-
     if (ladder == NULL || ladder2 == NULL || ladder3 == NULL || ladder4 == NULL || ladder5 == NULL)
     {
         printf("Failed to load ladder image: %s\n", IMG_GetError());
@@ -84,9 +73,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         printf("Failed to load snake image: %s\n", IMG_GetError());
         return;
     }
-
-    // // // Init all dice
-    // SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
 
     // Init all ladders (SDL_Texture)
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
@@ -102,8 +88,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Texture *snake_texture4 = SDL_CreateTextureFromSurface(renderer, snake4);
     SDL_Texture *snake_texture5 = SDL_CreateTextureFromSurface(renderer, snake5);
 
-    // // Free all ladder Surface
-    // SDL_FreeSurface(dice); // Free the surface after creating texture
 
     // Free all ladder Surface
     SDL_FreeSurface(ladder); // Free the surface after creating texture
@@ -119,12 +103,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_FreeSurface(snake4);
     SDL_FreeSurface(snake5);
 
-    // if (dice_texture == NULL) // failure check
-    // {
-    //     printf("Failed to create dice texture: %s\n", SDL_GetError());
-    //     return;
-    // }
-
     if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL || ladder_texture4 == NULL) //|| ladder_texture5 == NULL) // failure check
     {
         printf("Failed to create ladder texture: %s\n", SDL_GetError());
@@ -136,9 +114,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         printf("Failed to create snake texture: %s\n", SDL_GetError());
         return;
     }
-
-    // // place dice
-    // draw_img(renderer, dice_texture, LARGE_CELL_WIDTH, LARGE_CELL_HEIGHT, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
 
     // place ladder
     draw_img(renderer, ladder_texture, LARGE_CELL_WIDTH, LARGE_CELL_HEIGHT, 18, 1, 20, 3, screen_x, screen_y, 1, 1, 90);
@@ -155,7 +130,6 @@ void place_large_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     draw_img(renderer, snake_texture5, LARGE_CELL_WIDTH, LARGE_CELL_HEIGHT, 6, 8, 9, 11, screen_x, screen_y, 1, 1, 0);
 
     // Free the image texture after rendering
-    // SDL_DestroyTexture(dice_texture);
     SDL_DestroyTexture(ladder_texture);
     SDL_DestroyTexture(ladder_texture2);
     SDL_DestroyTexture(ladder_texture3);
@@ -288,53 +262,6 @@ void large_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 void large_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
-    // // Initialize SDL
-    // if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    // {
-    //     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-    //     return -1;
-    // }
-
-    // // Initialize SDL_ttf
-    // if (TTF_Init() == -1)
-    // {
-    //     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create window
-    // SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    // if (window == NULL)
-    // {
-    //     printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create renderer
-    // SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    // if (renderer == NULL)
-    // {
-    //     printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_DestroyWindow(window);
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Load font
-    // TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
-
-    // if (font == NULL)
-    // {
-    //     printf("Failed to load font: %s\n", TTF_GetError());
-    //     SDL_DestroyRenderer(renderer);
-    //     SDL_DestroyWindow(window);
-    //     TTF_Quit();
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
     // Main loop flag
     int quit = 0;
     SDL_Event e;
@@ -357,6 +284,7 @@ void large_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 if (e.button.button == SDL_BUTTON_LEFT)
                 {
                     // Generate a random dice value and choose the corresponding texture
+                    printf("num players = %d\n", num_players);
                     int dice_value = rand() % 6;
                     char *dice_choice = dice_paths[dice_value];
 

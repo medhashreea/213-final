@@ -5,6 +5,8 @@
         "sdl_image.h": "c",
         "sdl_ttf.h": "c",
         "sdl.h": "c",
-        "helpers.h": "c"
+        "helpers.h": "c",
+        "array": "c",
+        "string_view": "c"
     }
 }

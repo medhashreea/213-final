@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 
 char *dice_paths[] = {"grids/dice-imgs/one.png", "grids/dice-imgs/two.png", "grids/dice-imgs/three.png", "grids/dice-imgs/four.png", "grids/dice-imgs/five.png", "grids/dice-imgs/six.png"};
+// char *player_imgs[4] = {"grids/images/character.png", "grids/images/character2.png", "grids/images/character3.png", "grids/images/character4.png"};
 
 void draw_dice(SDL_Renderer *renderer, SDL_Texture *dice_texture)
 {

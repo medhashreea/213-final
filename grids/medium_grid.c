@@ -138,15 +138,15 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 
     // place ladder
     draw_img(renderer, ladder_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 6, 1, 8, 3, screen_x, screen_y, 1, 1, 90);
-    draw_img(renderer, ladder_texture3,MED_CELL_WIDTH, MED_CELL_HEIGHT, 26, 4, 28, 6, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, ladder_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT,33, 12, 35, 14, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, ladder_texture4,MED_CELL_WIDTH, MED_CELL_HEIGHT, 12, 8, 14, 10, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture3, MED_CELL_WIDTH, MED_CELL_HEIGHT, 26, 4, 28, 6, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT, 33, 12, 35, 14, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, ladder_texture4, MED_CELL_WIDTH, MED_CELL_HEIGHT, 12, 8, 14, 10, screen_x, screen_y, 1, 1, 0);
 
     // place snakes
-    draw_img(renderer, snake_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT,24, 0, 30, 4, screen_x, screen_y, 1, 1, 270);
-    draw_img(renderer, snake_texture2,MED_CELL_WIDTH, MED_CELL_HEIGHT, 14, 4, 18, 8, screen_x, screen_y, 1, 1, 0);
-    draw_img(renderer, snake_texture3,MED_CELL_WIDTH, MED_CELL_HEIGHT, 1, 2, 5, 6, screen_x, screen_y, 1, 1, 90);
-    draw_img(renderer, snake_texture4,MED_CELL_WIDTH, MED_CELL_HEIGHT, 20, 10, 24, 14, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, snake_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 24, 0, 30, 4, screen_x, screen_y, 1, 1, 270);
+    draw_img(renderer, snake_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT, 14, 4, 18, 8, screen_x, screen_y, 1, 1, 0);
+    draw_img(renderer, snake_texture3, MED_CELL_WIDTH, MED_CELL_HEIGHT, 1, 2, 5, 6, screen_x, screen_y, 1, 1, 90);
+    draw_img(renderer, snake_texture4, MED_CELL_WIDTH, MED_CELL_HEIGHT, 20, 10, 24, 14, screen_x, screen_y, 1, 1, 0);
 
     // Free the image texture after rendering
     // SDL_DestroyTexture(dice_texture);
@@ -280,53 +280,6 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
-    // // Initialize SDL
-    // if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    // {
-    //     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-    //     return -1;
-    // }
-
-    // // Initialize SDL_ttf
-    // if (TTF_Init() == -1)
-    // {
-    //     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create window
-    // SDL_Window *window = SDL_CreateWindow("Grid Example", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    // if (window == NULL)
-    // {
-    //     printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Create renderer
-    // SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    // if (renderer == NULL)
-    // {
-    //     printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
-    //     SDL_DestroyWindow(window);
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
-    // // Load font
-    // TTF_Font *font = TTF_OpenFont("/usr/share/fonts/fonts-go/Go-Bold.ttf", 16);
-
-    // if (font == NULL)
-    // {
-    //     printf("Failed to load font: %s\n", TTF_GetError());
-    //     SDL_DestroyRenderer(renderer);
-    //     SDL_DestroyWindow(window);
-    //     TTF_Quit();
-    //     SDL_Quit();
-    //     return -1;
-    // }
-
     // Main loop flag
     int quit = 0;
     SDL_Event e;
@@ -347,6 +300,7 @@ void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 if (e.button.button == SDL_BUTTON_LEFT)
                 {
                     // Generate a random dice value and choose the corresponding texture
+                    printf("num players = %d\n", num_players);
                     int dice_value = rand() % 6;
                     char *dice_choice = dice_paths[dice_value];
 
