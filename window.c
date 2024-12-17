@@ -26,13 +26,17 @@ typedef struct
     char *label;
 } Button;
 
-/** 
+/**
  * Creates the given text with given color and font at a particular location.
- * 
- * \param 
- * renderer - the passed down renderer
- * font, SDL_Color color, char *text, int x, int y)
- * \return
+ *
+ * \param
+ *      renderer - the passed down renderer
+ *      font - the passed down text font
+ *      color - the color for the text
+ *      text - what the text should say
+ *      x - x coordinate for text
+ *      y - y coordinate for text
+ * \return a rendered text on the screen
  */
 void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *text, int x, int y)
 {
@@ -46,7 +50,7 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *
     {
         printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
         return;
-    }
+    } // error check
 
     SDL_Texture *text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
     SDL_FreeSurface(text_surface);
@@ -55,25 +59,30 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *
     {
         printf("Unable to create texture from rendered text! SDL_Error: %s\n", SDL_GetError());
         return;
-    }
+    } // error check
 
     if (text_surface->w == 0 || text_surface->h == 0)
     {
         printf("Error: Rendered text surface has zero width or height!\n");
         SDL_FreeSurface(text_surface);
         return;
-    }
+    } // error check
 
-    SDL_Rect text_rect = {x, y, text_surface->w, text_surface->h};
-    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);
-    SDL_DestroyTexture(text_texture);
+    SDL_Rect text_rect = {x, y, text_surface->w, text_surface->h}; // set text_rect
+    SDL_RenderCopy(renderer, text_texture, NULL, &text_rect);      // render
+    SDL_DestroyTexture(text_texture);                              // destroy
 }
 
-/** 
- * description
- * 
+/**
+ * Creates an entry box for user input
+ *
  * \param
- * \return
+ *      renderer - the passed down renderer
+ *      font - the passed down text font
+ *      entry_box - SDL_Rect for the entry box
+ *      text_color - the color of input text
+ *      input_text - input text
+ * \return a rendered entry box for the user entry for num_players
  */
 void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_box, SDL_Color text_color, char *input_text)
 {
@@ -86,23 +95,32 @@ void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_bo
     render_text(renderer, font, text_color, input_text, entry_box->x + 5, entry_box->y + 5); // Offset for padding
 }
 
-/** 
- * description
- * 
+/**
+ * Creates an entry box for user input
+ *
  * \param
- * \return
+ *      renderer - the passed down renderer
+ *      font - the passed down text font
+ *      small_board - the rendered button for the small grid
+ *      medium_board - the rendered button for the medium grid
+ *      large_board - the rendered button for the large grid
+ * \return the homepage with all rendered features
  */
 void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Button medium_board, Button large_board)
 {
     // Main backdrop
     int margin = 25;
+
+    // calculate the dimensions
     int rect_width = SCREEN_WIDTH - margin;
     int rect_height = SCREEN_HEIGHT - margin;
     int screen_x = (SCREEN_WIDTH - rect_width) / 2;
     int screen_y = (SCREEN_HEIGHT - rect_height) / 2;
-    SDL_Rect board = {screen_x, screen_y, rect_width, rect_height};
-    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 255);
-    SDL_RenderFillRect(renderer, &board);
+
+    // render background
+    SDL_Rect board = {screen_x, screen_y, rect_width, rect_height}; // creates the background
+    SDL_SetRenderDrawColor(renderer, 207, 181, 163, 255);           // fills the rect in the beige color
+    SDL_RenderFillRect(renderer, &board);                           // render
 
     // Render the title at the top of the screen
     char *title = "SNAKES AND LADDERS";
@@ -131,11 +149,8 @@ void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Bu
     render_text(renderer, font, text_color, large_board.label, large_board.rect.x + (large_board.rect.w - 50) / 2, large_board.rect.y + (large_board.rect.h - 20) / 2);
 }
 
-/** 
- * description
- * 
- * \param
- * \return
+/**
+ * Main homepage & connects to the grid games.
  */
 int main(int argc, char **argv)
 {
@@ -216,13 +231,12 @@ int main(int argc, char **argv)
 
     while (!quit)
     {
-        // Handle events
-        while (SDL_PollEvent(&e) != 0)
+        while (SDL_PollEvent(&e) != 0) // events
         {
             if (e.type == SDL_QUIT)
             {
                 quit = 1;
-            }
+            } // if quit, then exit game
             else if (e.type == SDL_KEYDOWN)
             {
                 if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_4 && num_length < 1) // only takes first number input
@@ -230,35 +244,14 @@ int main(int argc, char **argv)
                     // Add the key to num_player if within valid range (1-4)
                     num_player[num_length++] = e.key.keysym.sym - SDLK_0 + '0'; // Convert int to char
                     num_player[num_length] = '\0';                              // Null-terminate the string
-                }
+                } // if key pressed is value between 1-4, read but only the first number entered and numbers within 1-4
                 else if (e.key.keysym.sym == SDLK_BACKSPACE && num_length > 0)
                 {
                     // Remove the last character if backspace is pressed
                     num_length--;
                     num_player[num_length] = '\0'; // Null-terminate the string
-                }
-                else if (e.key.keysym.sym == SDLK_RETURN)
-                {
-                    // Process the number of players when Enter is pressed
-                    if (num_length > 0)
-                    {
-                        int num_players = atoi(num_player);
-                        if (num_players >= 1 && num_players <= 4)
-                        {
-                            // Handle the selected number of players
-                            printf("Number of players: %d\n", num_players);
-                            // Implement logic to start the game with 'num_players' here
-                        }
-                        else
-                        {
-                            printf("Invalid number of players. Please choose a number between 1 and 4.\n");
-                        }
-                        // Reset input for the next input
-                        num_length = 0;
-                        num_player[0] = '\0';
-                    }
-                }
-            }
+                } // erase entry if backspace
+            } // user input for num_players check
             else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT)
             {
                 int num_players = atoi(num_player); // convert char num to integer
@@ -266,30 +259,31 @@ int main(int argc, char **argv)
                 if (num_players == 0)
                 {
                     num_players = 1;
-                } // default num player to 1 player
+                } // default num player to 1 player, if no value
 
                 SDL_Point mousePos;
                 SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
                 if (SDL_PointInRect(&mousePos, &small_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Small Game");       // change window name
                     small_grid_game(renderer, font, num_players);   // Call small game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
-                }
+                } // mouse click in Small Game
                 else if (SDL_PointInRect(&mousePos, &medium_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Medium Game");      // change window name
                     medium_grid_game(renderer, font, num_players);  // Call medium game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
-                }
+                } // mouse click in Medium Game
                 else if (SDL_PointInRect(&mousePos, &large_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Large Game");       // change window name
                     large_grid_game(renderer, font, num_players);   // Call large game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
-                }
-            }
-        }
+                } // mouse click in Large Game
+            } // check if any of the grid buttons were pressed
+        } // during events (interaction)
 
         // Clear screen
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black background
@@ -298,9 +292,10 @@ int main(int argc, char **argv)
         // Opening window
         intro_screen(renderer, font, small_board, medium_board, large_board); // create backdrop
         player_entry_box(renderer, font, &entry_box, num_color, num_player);
+
         // Update the screen
         SDL_RenderPresent(renderer);
-    }
+    } // while still in the window
 
     // Clean up and quit SDL
     TTF_CloseFont(font);
