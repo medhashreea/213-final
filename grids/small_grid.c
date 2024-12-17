@@ -457,9 +457,9 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 }
 
                 // Check for snakes or ladders after player has landed on final cell
-                if (snake_or_ladder(players[cur_p]->cur_position))
+                if (snake_or_ladder(players[cur_p]->cur_position, small_ladders, 3, small_snakes, 3))
                 {
-                    players[cur_p]->cur_position = snake_ladder_pos(players[cur_p]->cur_position);
+                    players[cur_p]->cur_position = snake_ladder_pos(players[cur_p]->cur_position, small_ladders, 3, small_snakes, 3);
                 }
 
                 cur_dice_step = 0;           // Reset step counter for next turn

@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
 // data struct for scheduler
 typedef enum
@@ -30,7 +31,7 @@ void draw_dice(SDL_Renderer *renderer, SDL_Texture *dice_texture);
 void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int CELL_WIDTH, int CELL_HEIGHT, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn);
 
 // Returns the new snake or ladder position
-int snake_ladder_pos(int current_pos, int ladder, int snake);
+int snake_ladder_pos(int current_pos, int ladders[][2], int num_ladders, int snakes[][2], int num_snakes);
 
 // Detrmines if the position is a snake or ladder
-bool snake_or_ladder(int current_pos, int ladder, int snake);
+bool snake_or_ladder(int current_pos, int ladders[][2], int num_ladders, int snakes[][2], int num_snakes);

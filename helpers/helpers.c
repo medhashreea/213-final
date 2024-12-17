@@ -48,46 +48,69 @@ void draw_img(SDL_Renderer *renderer, SDL_Texture *texture, int CELL_WIDTH, int 
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, NULL, SDL_FLIP_NONE);
 } // draw_diagonal_
 
+
 /**
- * Returns the new snake or ladder position
+ * Returns the new snake or ladder position for any given arrays.
  *
  * \param current_pos - an integer representing the current position
+ * \param ladders - a 2D array containing ladder positions
+ * \param num_ladders - the number of ladders in the grid
+ * \param snakes - a 2D array containing snake positions
+ * \param num_snakes - the number of snakes in the grid
  * \return current_pos - an integer representing the updated current position
  */
-int snake_ladder_pos(int current_pos, int ladder, int snake)
+int snake_ladder_pos(int current_pos, int ladders[][2], int num_ladders, int snakes[][2], int num_snakes)
 {
-    for (int i = 0; i < 3; i++)
+    // Check for snakes
+    for (int i = 0; i < num_snakes; i++)
     {
-        // Checks if it's a snake
-        if (current_pos == snake[i][0])
+        if (current_pos == snakes[i][0])
         {
-            current_pos = snake[i][1];
-            break;
-        }
-        // Checks if it's a ladder
-        else if (current_pos == ladder[i][0])
-        {
-            current_pos = ladder[i][1];
+            current_pos = snakes[i][1];
             break;
         }
     }
+
+    // Check for ladders
+    for (int i = 0; i < num_ladders; i++)
+    {
+        if (current_pos == ladders[i][0])
+        {
+            current_pos = ladders[i][1];
+            break;
+        }
+    }
+
     return current_pos;
 }
 
 /**
- * Detrmines if the position is a snake or ladder
+ * Determines if the position is a snake or ladder for any given arrays.
  *
  * \param current_pos - an integer representing the current position
- * \return bool
+ * \param ladders - a 2D array containing ladder positions
+ * \param num_ladders - the number of ladders in the grid
+ * \param snakes - a 2D array containing snake positions
+ * \param num_snakes - the number of snakes in the grid
+ * \return bool - returns true if the position is a snake or ladder, false otherwise
  */
-bool snake_or_ladder(int current_pos, int ladder, int snake)
+bool snake_or_ladder(int current_pos, int ladders[][2], int num_ladders, int snakes[][2], int num_snakes)
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < num_snakes; i++)
     {
-        if (current_pos == snake[i][0] || current_pos == ladder[i][0])
+        if (current_pos == snakes[i][0])
         {
             return true;
         }
     }
+
+    for (int i = 0; i < num_ladders; i++)
+    {
+        if (current_pos == ladders[i][0])
+        {
+            return true;
+        }
+    }
+
     return false;
 }
