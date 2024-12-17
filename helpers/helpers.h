@@ -35,3 +35,6 @@ int snake_ladder_pos(int current_pos, int ladders[][2], int num_ladders, int sna
 
 // Detrmines if the position is a snake or ladder
 bool snake_or_ladder(int current_pos, int ladders[][2], int num_ladders, int snakes[][2], int num_snakes);
+
+// Moves the current player
+void move_player(SDL_Renderer *renderer, int current_pos, SDL_Texture *player_texture, int SCREEN_WIDTH, int SCREEN_HEIGHT, int CELL_WIDTH, int CELL_HEIGHT);

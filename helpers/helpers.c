@@ -114,3 +114,48 @@ bool snake_or_ladder(int current_pos, int ladders[][2], int num_ladders, int sna
 
     return false;
 }
+
+/**
+ * Moves the current player
+ *
+ * \param renderer - a pointer to the renderer
+ * \param current_pos - an integer representing the current position
+ * \param player_texture - a pointer to the player_texture
+ */
+
+void move_player(SDL_Renderer *renderer, int current_pos, SDL_Texture *player_texture, int SCREEN_WIDTH, int SCREEN_HEIGHT, int CELL_WIDTH, int CELL_HEIGHT)
+{
+    // Board dimensions
+    int rows = 25;
+    int cols = 5;
+    int cell_width = CELL_WIDTH;
+    int cell_height = CELL_HEIGHT;
+
+    // Calculate board position
+    int screen_x = (SCREEN_WIDTH - (cols * cell_width)) / 2;   // Center horizontally
+    int screen_y = (SCREEN_HEIGHT - (rows * cell_height)) / 2; // Center vertically
+
+    // Calculate the character's grid position
+    int row = current_pos / cols;
+    int col;
+
+    // If the row is even, increment the character (move right)
+    if (row % 2 == 0)
+    {
+        col = current_pos % cols;
+    }
+    // If the row is odd, decrement character (move left)
+    else
+    {
+        col = cols - 1 - (current_pos % cols);
+    }
+
+    // Calculate the character's position
+    int char_x = screen_x + col * cell_width;
+    int char_y = screen_y + (rows - 1 - row) * cell_height; // Top-to-bottom layout
+
+    // Render the character
+    SDL_Rect character_rect = {char_x, char_y, cell_width, cell_height};
+    SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
+    IMG_Quit();
+}

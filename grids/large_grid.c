@@ -13,6 +13,13 @@
 #define SCREEN_HEIGHT 1000   // Height of screen
 #define LARGE_CELL_WIDTH 37  // Width of each cell
 #define LARGE_CELL_HEIGHT 23 // Height of each cell
+#define LARGE_FINAL_POS 124
+
+// Ladder positions on the grid
+int large_ladders[5][2] = {{24, 33}, {62, 73}, {97, 106}};
+
+// Snake positions on the grid
+int large_snakes[5][2] = {{27, 9}, {61, 42}, {118, 87}};
 
 /**
  * Places the Snakes and Ladders images

@@ -24,99 +24,6 @@ int small_ladders[3][2] = {{24, 33}, {62, 73}, {97, 106}};
 // Snake positions on the grid
 int small_snakes[3][2] = {{27, 9}, {61, 42}, {118, 87}};
 
-/*
- * Functions
- */
-
-// /**
-//  * Returns the new snake or ladder position
-//  *
-//  * \param current_pos - an integer representing the current position
-//  * \return current_pos - an integer representing the updated current position
-//  */
-// int snake_ladder_pos(int current_pos)
-// {
-//     for (int i = 0; i < 3; i++)
-//     {
-//         // Checks if it's a snake
-//         if (current_pos == small_snakes[i][0])
-//         {
-//             current_pos = small_snakes[i][1];
-//             break;
-//         }
-//         // Checks if it's a ladder
-//         else if (current_pos == small_ladders[i][0])
-//         {
-//             current_pos = small_ladders[i][1];
-//             break;
-//         }
-//     }
-//     return current_pos;
-// }
-
-// /**
-//  * Detrmines if the position is a snake or ladder
-//  *
-//  * \param current_pos - an integer representing the current position
-//  * \return bool
-//  */
-// bool snake_or_ladder(int current_pos)
-// {
-//     for (int i = 0; i < 3; i++)
-//     {
-//         if (current_pos == small_snakes[i][0] || current_pos == small_ladders[i][0])
-//         {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-/**
- * Moves the current player
- *
- * \param renderer - a pointer to the renderer
- * \param current_pos - an integer representing the current position
- * \param player_texture - a pointer to the player_texture
- */
-
-void move_player(SDL_Renderer *renderer, int current_pos, SDL_Texture *player_texture)
-{
-    // Board dimensions
-    int rows = 25;
-    int cols = 5;
-    int cell_width = SMALL_CELL_WIDTH;
-    int cell_height = SMALL_CELL_HEIGHT;
-
-    // Calculate board position
-    int screen_x = (SCREEN_WIDTH - (cols * cell_width)) / 2;   // Center horizontally
-    int screen_y = (SCREEN_HEIGHT - (rows * cell_height)) / 2; // Center vertically
-
-    // Calculate the character's grid position
-    int row = current_pos / cols;
-    int col;
-
-    // If the row is even, increment the character (move right)
-    if (row % 2 == 0)
-    {
-        col = current_pos % cols;
-    }
-    // If the row is odd, decrement character (move left)
-    else
-    {
-        col = cols - 1 - (current_pos % cols);
-    }
-
-    // Calculate the character's position
-    int char_x = screen_x + col * cell_width;
-    int char_y = screen_y + (rows - 1 - row) * cell_height; // Top-to-bottom layout
-
-    // Render the character
-    SDL_Rect character_rect = {char_x, char_y, cell_width, cell_height};
-    SDL_RenderCopy(renderer, player_texture, NULL, &character_rect);
-    IMG_Quit();
-}
-
 /**
  * Initializes the grid
  *
@@ -230,17 +137,15 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
     // Set the color for the grid lines
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    // For loop to draw the vertical grid lines
     for (int x = screen_x; x <= screen_x + width; x += SMALL_CELL_WIDTH)
     {
         SDL_RenderDrawLine(renderer, x, screen_y, x, screen_y + height);
-    }
+    } // for loop to draw the vertical grid lines
 
-    // For loop to draw the horizontal grid lines
     for (int y = screen_y; y <= screen_y + height; y += SMALL_CELL_HEIGHT)
     {
         SDL_RenderDrawLine(renderer, screen_x, y, screen_x + width, y);
-    }
+    } // for loop to draw the horizontal grid lines
 
     SDL_Color color = {255, 255, 255, 255}; // color
     int number = 1;                         // start value
@@ -342,6 +247,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
     srand(time(NULL));      // init to generate random values later
     IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
 
+    // Main loop flag
     int quit = 0;
     SDL_Event e;
     SDL_Texture *dice_texture = NULL; // Variable to hold the current dice texture
@@ -434,7 +340,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                     if (players[cur_p]->cur_position >= SMALL_FINAL_POS)
                     {
                         small_grid(renderer, font);
-                        move_player(renderer, SMALL_FINAL_POS, players[cur_p]->player_texture);
+                        move_player(renderer, SMALL_FINAL_POS, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
                         players[cur_p]->state = win;
                         game_done = true;
                         SDL_Delay(250);
@@ -446,10 +352,10 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 
                     for (int i = 0; i < num_players; i++)
                     {
-                        move_player(renderer, players[i]->cur_position, players[i]->player_texture);
+                        move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
                     } // Render all players in their positions
 
-                    move_player(renderer, players[cur_p]->cur_position, players[cur_p]->player_texture); // Draw the player at the new position
+                    move_player(renderer, players[cur_p]->cur_position, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT); // Draw the player at the new position
 
                     SDL_Delay(250); // 200 ms delay for smooth movement
                     SDL_RenderPresent(renderer);
@@ -473,7 +379,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 
             for (int i = 0; i < num_players; i++) // Render all players in their positions
             {
-                move_player(renderer, players[i]->cur_position, players[i]->player_texture);
+                move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
             }
 
             SDL_RenderPresent(renderer);

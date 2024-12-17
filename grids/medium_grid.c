@@ -25,16 +25,14 @@ int medium_ladders[4][2] = {{74, 103}, {174, 203}, {379, 410}, {477, 506}};
 int medium_snakes[4][2] = {{243, 123}, {288, 225}, {354, 323}, {574, 516}};
 
 /**
- * Places the Snakes and Ladders images
+ * Initializes the grid
+ *
+ * \param renderer - a pointer to the renderer
+ * \param screen_x - in integer representign the x coordinate
+ * \param screen_y - in integer representign the y coordinate
  */
 void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
 {
-    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
-    char *dice_choice = "";
-
-    int dice_value = rand() % 6;
-    dice_choice = dice_paths[dice_value];
-
     // Init all ladders (SDL_Surface)
     SDL_Surface *ladder = IMG_Load("grids/images/ladder.png");   // Load your PNG image
     SDL_Surface *ladder2 = IMG_Load("grids/images/ladder2.png"); // Load your PNG image
@@ -71,7 +69,7 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Texture *snake_texture4 = SDL_CreateTextureFromSurface(renderer, snake4);
 
     // Free all ladder Surface
-    SDL_FreeSurface(ladder); // Free the surface after creating texture
+    SDL_FreeSurface(ladder);
     SDL_FreeSurface(ladder2);
     SDL_FreeSurface(ladder3);
     SDL_FreeSurface(ladder4);
@@ -82,25 +80,25 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_FreeSurface(snake3);
     SDL_FreeSurface(snake4);
 
+    // Checks if any of the ladder textures are null
     if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL || ladder_texture4 == NULL) // failure check
     {
         printf("Failed to create ladder texture: %s\n", SDL_GetError());
         return;
     }
 
+    // Checcks if any of the snake textures are null
     if (snake_texture == NULL || snake_texture2 == NULL || snake_texture3 == NULL || snake_texture4 == NULL) // failure check
     {
         printf("Failed to create snake texture: %s\n", SDL_GetError());
         return;
     }
 
-    // place ladder
+    // Places images on the grid
     draw_img(renderer, ladder_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 6, 1, 8, 3, screen_x, screen_y, 1, 1, 90);
     draw_img(renderer, ladder_texture3, MED_CELL_WIDTH, MED_CELL_HEIGHT, 26, 4, 28, 6, screen_x, screen_y, 1, 1, 0);
     draw_img(renderer, ladder_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT, 33, 12, 35, 14, screen_x, screen_y, 1, 1, 0);
     draw_img(renderer, ladder_texture4, MED_CELL_WIDTH, MED_CELL_HEIGHT, 12, 8, 14, 10, screen_x, screen_y, 1, 1, 0);
-
-    // place snakes
     draw_img(renderer, snake_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 24, 0, 30, 4, screen_x, screen_y, 1, 1, 270);
     draw_img(renderer, snake_texture2, MED_CELL_WIDTH, MED_CELL_HEIGHT, 14, 4, 18, 8, screen_x, screen_y, 1, 1, 0);
     draw_img(renderer, snake_texture3, MED_CELL_WIDTH, MED_CELL_HEIGHT, 1, 2, 5, 6, screen_x, screen_y, 1, 1, 90);
@@ -145,17 +143,16 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
     for (int x = screen_x; x <= screen_x + width; x += MED_CELL_WIDTH)
     {
         SDL_RenderDrawLine(renderer, x, screen_y, x, screen_y + height);
-    } // vertical lines on board
+    } // for loop to draw the vertical grid lines
 
     for (int y = screen_y; y <= screen_y + height; y += MED_CELL_HEIGHT)
     {
         SDL_RenderDrawLine(renderer, screen_x, y, screen_x + width, y);
-    } // horizontal lines on board
+    } // for loop to draw the horizontal grid lines
 
-    // add values in boxes
-    SDL_Color color = {255, 255, 255, 255};
-    int number = 1;
-    char numStr[10];
+    SDL_Color color = {255, 255, 255, 255}; // color
+    int number = 1;                         // start value
+    char num_str[10];
 
     // loop to add values in each cell
     for (int row = rows - 1; (row <= rows) && (row >= 0); row--) // loop over all rows first
@@ -164,10 +161,10 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
         {
             for (int col = 0; col < cols; col++) // for columns going left to right, increment
             {
-                snprintf(numStr, sizeof(numStr), "%d", number++); // print value in cell
+                snprintf(num_str, sizeof(num_str), "%d", number++); // print value in cell
 
                 // Create text surface and texture
-                SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
+                SDL_Surface *textSurface = TTF_RenderText_Solid(font, num_str, color);
                 if (!textSurface)
                 {
                     printf("Failed to render text: %s\n", TTF_GetError());
@@ -198,10 +195,10 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
         {
             for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
             {
-                snprintf(numStr, sizeof(numStr), "%d", number++); // print value in cell
+                snprintf(num_str, sizeof(num_str), "%d", number++); // print value in cell
 
                 // Create text surface and texture
-                SDL_Surface *textSurface = TTF_RenderText_Solid(font, numStr, color);
+                SDL_Surface *textSurface = TTF_RenderText_Solid(font, num_str, color);
                 if (!textSurface)
                 {
                     printf("Failed to render text: %s\n", TTF_GetError());
@@ -237,6 +234,9 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
 
 void medium_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 {
+    srand(time(NULL));      // init to generate random values later
+    IMG_Init(IMG_INIT_PNG); // Initialize support for PNGs
+
     // Main loop flag
     int quit = 0;
     SDL_Event e;
