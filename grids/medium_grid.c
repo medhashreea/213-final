@@ -1,44 +1,28 @@
+/*
+ * medium_grid.c
+ * The snakes and ladders game on a medium grid.
+ */
+
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
+#include <stdbool.h>
+#include <time.h>
 #include "../helpers/helpers.h"
 
-// #define SCREEN_WIDTH 1000  // Width of screen
-// #define SCREEN_HEIGHT 1000 // Height of screen
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
 #define MED_CELL_WIDTH 50  // Width of each cell
 #define MED_CELL_HEIGHT 25 // Height of each cell
+#define MED_FINAL_POS 599  // final cell
 
-// /**
-//  * Function to draw a diagonal ladder between two points
-//  */
-// void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
-// {
-//     // Calculate the start position in pixels (bottom of startRow, startCol)
-//     int startX = screen_x + startCol * MED_CELL_WIDTH + MED_CELL_WIDTH;
-//     int startY = screen_y + startRow * MED_CELL_HEIGHT + MED_CELL_HEIGHT / 2;
+// Ladder positions on the grid
+int medium_ladders[4][2] = {{74, 103}, {174, 203}, {379, 410}, {477, 506}};
 
-//     // Calculate the end position in pixels (top of endRow, endCol)
-//     int endX = screen_x + endCol * MED_CELL_WIDTH + MED_CELL_WIDTH;
-//     int endY = screen_y + endRow * MED_CELL_HEIGHT + MED_CELL_HEIGHT / 2;
-
-//     // Calculate the width (distance btw columns) and height (distance between columns)
-//     int ladderWidth = scale_x * abs(endX - startX);
-//     int ladderHeight = scale_y * abs(endY - startY);
-
-//     // Calculate the angle of rotation (in radians) using the arctangent of slope
-//     double angle = atan2(endY - startY, endX - startX) * turn / M_PI;
-
-//     // Create the rectangle for the ladder image
-//     SDL_Rect ladderRect = {startX, startY, ladderWidth, ladderHeight};
-
-//     // Render the ladder texture, rotated to match diagonal
-//     SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
-//     // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
-// } // draw_diagonal_ladder
+// Snake positions on the grid
+int medium_snakes[4][2] = {{243, 123}, {288, 225}, {354, 323}, {574, 516}};
 
 /**
  * Places the Snakes and Ladders images
@@ -51,10 +35,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     int dice_value = rand() % 6;
     dice_choice = dice_paths[dice_value];
 
-    // // // init dice
-    // char* dice_chose = roll_dice(renderer);
-    // SDL_Surface *dice = IMG_Load(dice_choice); // Load your PNG image
-
     // Init all ladders (SDL_Surface)
     SDL_Surface *ladder = IMG_Load("grids/images/ladder.png");   // Load your PNG image
     SDL_Surface *ladder2 = IMG_Load("grids/images/ladder2.png"); // Load your PNG image
@@ -65,13 +45,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Surface *snake2 = IMG_Load("grids/images/snake5.png"); // Load your PNG image
     SDL_Surface *snake3 = IMG_Load("grids/images/snake6.png"); // Load your PNG image
     SDL_Surface *snake4 = IMG_Load("grids/images/snake8.png"); // Load your PNG image
-
-    // // // failure check
-    // if (dice == NULL)
-    // {
-    //     printf("Failed to load dice: %s\n", IMG_GetError());
-    //     return;
-    // }
 
     if (ladder == NULL || ladder2 == NULL || ladder3 == NULL || ladder4 == NULL)
     {
@@ -85,9 +58,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         return;
     }
 
-    // // // Init all dice
-    // SDL_Texture *dice_texture = SDL_CreateTextureFromSurface(renderer, dice);
-
     // Init all ladders (SDL_Texture)
     SDL_Texture *ladder_texture = SDL_CreateTextureFromSurface(renderer, ladder);
     SDL_Texture *ladder_texture2 = SDL_CreateTextureFromSurface(renderer, ladder2);
@@ -99,9 +69,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_Texture *snake_texture2 = SDL_CreateTextureFromSurface(renderer, snake2);
     SDL_Texture *snake_texture3 = SDL_CreateTextureFromSurface(renderer, snake3);
     SDL_Texture *snake_texture4 = SDL_CreateTextureFromSurface(renderer, snake4);
-
-    // // Free all ladder Surface
-    // SDL_FreeSurface(dice); // Free the surface after creating texture
 
     // Free all ladder Surface
     SDL_FreeSurface(ladder); // Free the surface after creating texture
@@ -115,12 +82,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     SDL_FreeSurface(snake3);
     SDL_FreeSurface(snake4);
 
-    // if (dice_texture == NULL) // failure check
-    // {
-    //     printf("Failed to create dice texture: %s\n", SDL_GetError());
-    //     return;
-    // }
-
     if (ladder_texture == NULL || ladder_texture2 == NULL || ladder_texture3 == NULL || ladder_texture4 == NULL) // failure check
     {
         printf("Failed to create ladder texture: %s\n", SDL_GetError());
@@ -132,9 +93,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
         printf("Failed to create snake texture: %s\n", SDL_GetError());
         return;
     }
-
-    // // place dice
-    // draw_img(renderer, dice_texture, int CELL_WIDTH, int CELL_HEIGHT, -2, 2, 0, 5, screen_x, screen_y, 1, 1, 0);
 
     // place ladder
     draw_img(renderer, ladder_texture, MED_CELL_WIDTH, MED_CELL_HEIGHT, 6, 1, 8, 3, screen_x, screen_y, 1, 1, 90);
@@ -149,7 +107,6 @@ void place_medium_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
     draw_img(renderer, snake_texture4, MED_CELL_WIDTH, MED_CELL_HEIGHT, 20, 10, 24, 14, screen_x, screen_y, 1, 1, 0);
 
     // Free the image texture after rendering
-    // SDL_DestroyTexture(dice_texture);
     SDL_DestroyTexture(ladder_texture);
     SDL_DestroyTexture(ladder_texture2);
     SDL_DestroyTexture(ladder_texture3);
@@ -203,7 +160,7 @@ void medium_grid(SDL_Renderer *renderer, TTF_Font *font)
     // loop to add values in each cell
     for (int row = rows - 1; (row <= rows) && (row >= 0); row--) // loop over all rows first
     {
-        if ((row % 2) == 0) // check if row is even
+        if ((row % 2) != 0) // check if row is even
         {
             for (int col = 0; col < cols; col++) // for columns going left to right, increment
             {

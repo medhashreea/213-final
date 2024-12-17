@@ -1,3 +1,7 @@
+/*
+ * large_grid.c
+ * The snakes and ladders game on a large grid.
+ */
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -9,34 +13,6 @@
 #define SCREEN_HEIGHT 1000   // Height of screen
 #define LARGE_CELL_WIDTH 37  // Width of each cell
 #define LARGE_CELL_HEIGHT 23 // Height of each cell
-
-// /**
-//  * Function to draw a diagonal ladder between two points
-//  */
-// void draw_img(SDL_Renderer *renderer, SDL_Texture *ladder_texture, int startRow, int startCol, int endRow, int endCol, int screen_x, int screen_y, double scale_x, double scale_y, int turn)
-// {
-//     // Calculate the start position in pixels (bottom of startRow, startCol)
-//     int startX = screen_x + startCol * CELL_WIDTH + CELL_WIDTH;
-//     int startY = screen_y + startRow * CELL_HEIGHT + CELL_HEIGHT / 2;
-
-//     // Calculate the end position in pixels (top of endRow, endCol)
-//     int endX = screen_x + endCol * CELL_WIDTH + CELL_WIDTH;
-//     int endY = screen_y + endRow * CELL_HEIGHT + CELL_HEIGHT / 2;
-
-//     // Calculate the width (distance btw columns) and height (distance between columns)
-//     int ladderWidth = scale_x * abs(endX - startX);
-//     int ladderHeight = scale_y * abs(endY - startY);
-
-//     // Calculate the angle of rotation (in radians) using the arctangent of slope
-//     double angle = atan2(endY - startY, endX - startX) * turn / M_PI;
-
-//     // Create the rectangle for the ladder image
-//     SDL_Rect ladderRect = {startX, startY, ladderWidth, ladderHeight};
-
-//     // Render the ladder texture, rotated to match diagonal
-//     SDL_RenderCopyEx(renderer, ladder_texture, NULL, &ladderRect, angle, NULL, SDL_FLIP_NONE);
-//     // SDL_RenderCopy(renderer, ladder_texture, NULL, &ladderRect);
-// } // draw_diagonal_ladder
 
 /**
  * Places the Snakes and Ladders images
@@ -185,7 +161,7 @@ void large_grid(SDL_Renderer *renderer, TTF_Font *font)
     // loop to add values in each cell
     for (int row = rows - 1; (row <= rows) && (row >= 0); row--) // loop over all rows first
     {
-        if ((row % 2) == 0) // check if row is even
+        if ((row % 2) != 0) // check if row is even
         {
             for (int col = 0; col < cols; col++) // for columns going left to right, increment
             {

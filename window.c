@@ -9,7 +9,6 @@
 #include <SDL2/SDL_image.h>
 #include <FL/math.h>
 #include "helpers/helpers.h"
-#include <pthread.h>
 
 #include "grids/small_grid.c"
 #include "grids/medium_grid.c"
@@ -29,13 +28,12 @@ typedef struct
 /**
  * Creates the given text with given color and font at a particular location.
  *
- * \param
- *      renderer - the passed down renderer
- *      font - the passed down text font
- *      color - the color for the text
- *      text - what the text should say
- *      x - x coordinate for text
- *      y - y coordinate for text
+ * \param renderer - the passed down renderer
+ * \param font - the passed down text font
+ * \param color - the color for the text
+ * \param text - what the text should say
+ * \param x - x coordinate for text
+ * \param y - y coordinate for text
  * \return a rendered text on the screen
  */
 void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *text, int x, int y)
@@ -76,12 +74,11 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *
 /**
  * Creates an entry box for user input
  *
- * \param
- *      renderer - the passed down renderer
- *      font - the passed down text font
- *      entry_box - SDL_Rect for the entry box
- *      text_color - the color of input text
- *      input_text - input text
+ * \param renderer - the passed down renderer
+ * \param font - the passed down text font
+ * \param entry_box - SDL_Rect for the entry box
+ * \param text_color - the color of input text
+ * \param input_text - input text
  * \return a rendered entry box for the user entry for num_players
  */
 void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_box, SDL_Color text_color, char *input_text)
@@ -98,12 +95,11 @@ void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_bo
 /**
  * Creates an entry box for user input
  *
- * \param
- *      renderer - the passed down renderer
- *      font - the passed down text font
- *      small_board - the rendered button for the small grid
- *      medium_board - the rendered button for the medium grid
- *      large_board - the rendered button for the large grid
+ * \param renderer - the passed down renderer
+ * \param font - the passed down text font
+ * \param small_board - the rendered button for the small grid
+ * \param medium_board - the rendered button for the medium grid
+ * \param large_board - the rendered button for the large grid
  * \return the homepage with all rendered features
  */
 void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Button medium_board, Button large_board)
