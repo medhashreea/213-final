@@ -1,3 +1,8 @@
+/**
+ * window.c
+ *
+ * This file has the main where the homepage is and connects to the game boards.
+ */
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -10,47 +15,8 @@
 #include "grids/medium_grid.c"
 #include "grids/large_grid.c"
 
-// Macros
 #define SCREEN_WIDTH 1900
 #define SCREEN_HEIGHT 1000
-
-// void make_threads() {
-// for (int i = 0; i < 4; i++)
-// {
-//     // Creates thread
-//     if (pthread_create(&threads[i], NULL, move_player(player_t->renderer, player_t->cur_position), &char_threads_array[i]))
-//     {
-//         perror("pthread_create failed");
-//         exit(2);
-//     }
-//     // Waits for thread
-//     if (pthread_join(threads[i], NULL))
-//     {
-//         perror("pthread_join failed");
-//         exit(2);
-//     }
-// }
-// }
-
-// malloc(sizeof);
-
-// create threads, wait threads, synchronize
-
-// create, wait, synchgrnoize
-
-// struct character_array[4];
-
-// pthread_t threads[4];
-
-// make struct with renderer, cur_position, and each image corresponding to each thread manually
-
-// data struct to hold player information
-// typedef struct player
-// {
-//     // SDL_Renderer *renderer;
-//     SDL_Texture *player_texture;
-//     int cur_position;
-// } player_t;
 
 // data struct to hold butoon information
 typedef struct
@@ -60,12 +26,19 @@ typedef struct
     char *label;
 } Button;
 
+/** 
+ * Creates the given text with given color and font at a particular location.
+ * 
+ * \param 
+ * renderer - the passed down renderer
+ * font, SDL_Color color, char *text, int x, int y)
+ * \return
+ */
 void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *text, int x, int y)
 {
     if (text == NULL || text[0] == '\0')
     {
-        // Don't render if the text is empty
-        return;
+        return; // Don't render if the text is empty
     }
 
     SDL_Surface *text_surface = TTF_RenderText_Blended(font, text, color);
@@ -96,6 +69,12 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, SDL_Color color, char *
     SDL_DestroyTexture(text_texture);
 }
 
+/** 
+ * description
+ * 
+ * \param
+ * \return
+ */
 void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_box, SDL_Color text_color, char *input_text)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color for the box
@@ -107,6 +86,12 @@ void player_entry_box(SDL_Renderer *renderer, TTF_Font *font, SDL_Rect *entry_bo
     render_text(renderer, font, text_color, input_text, entry_box->x + 5, entry_box->y + 5); // Offset for padding
 }
 
+/** 
+ * description
+ * 
+ * \param
+ * \return
+ */
 void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Button medium_board, Button large_board)
 {
     // Main backdrop
@@ -146,6 +131,12 @@ void intro_screen(SDL_Renderer *renderer, TTF_Font *font, Button small_board, Bu
     render_text(renderer, font, text_color, large_board.label, large_board.rect.x + (large_board.rect.w - 50) / 2, large_board.rect.y + (large_board.rect.h - 20) / 2);
 }
 
+/** 
+ * description
+ * 
+ * \param
+ * \return
+ */
 int main(int argc, char **argv)
 {
     // Initialize SDL

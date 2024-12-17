@@ -363,19 +363,16 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
         players[i]->player_texture = player_textures; // init player's texture
 
         SDL_FreeSurface(player_surface); // Free the surface after creating the texture
-        printf("pos: %d \n img: %s \n", players[i]->cur_position, player_imgs[i]);
-        // SDL_FreeTexture(player_textures);             // Free the texture after init in struct texture
     } // loop to set up player(s)
 
     int dice_value;         // init for dice value
     int cur_dice_step = 0;  // init dice to start counting at 0
     bool game_done = false; // while the user is in the small snakes & ladders window
-    int cur_p = 0;
 
     while (!quit)
     {
-        // for (cur_p = 0; cur_p < num_players; cur_p++)
-        while (cur_p < num_players && !game_done)
+        int cur_p = 0;
+        for (cur_p = 0; cur_p < num_players; cur_p++)
         {
             // Handle events
             while (SDL_PollEvent(&e) != 0)
@@ -408,7 +405,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                         dice_texture = SDL_CreateTextureFromSurface(renderer, dice_surface);
                         SDL_FreeSurface(dice_surface); // Free the surface after creating texture
                     }
-                    printf("cur_p: %d \n pos: %d \n img: %s \n", cur_p, players[cur_p]->cur_position, player_imgs[cur_p]);
+                    // printf("cur_p: %d \n pos: %d \n img: %s \n", cur_p, players[cur_p]->cur_position, player_imgs[cur_p]);
                     players[cur_p]->state = move;
                 } // Check if left mouse button was clicked
             }
@@ -506,21 +503,18 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                 SDL_Delay(1000); // delay for smooth movement
                 break;
             }
-
-            // // if on the last player and no player has won, p == 0 to circle back
-            // if (cur_p == num_players - 1)
-            // {
-            //     cur_p = 0;
-            //     // continue;
-            // }
-            // Move to the next player after the current one finishes their turn
-            cur_p = (cur_p + 1) % num_players;
         } // While
-    }
+          
+        if (cur_p == num_players - 1)
+        {
+            cur_p = 0;
+        }// if on the last player and no player has won, p == 0 to circle back
+    } // while not quit loop
+
     // Cleanup the textures after the game loop or when done
     for (int i = 0; i < num_players; i++)
     {
         SDL_DestroyTexture(players[i]->player_texture); // Free the player texture
         free(players[i]);                               // Free the player struct
-    }
-}
+    } // clean up loop
+} // small_grid_game loop
