@@ -7,6 +7,8 @@
         "sdl.h": "c",
         "helpers.h": "c",
         "array": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "stdbool.h": "c",
+        "time.h": "c"
     }
 }

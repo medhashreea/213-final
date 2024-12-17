@@ -17,6 +17,8 @@
 #define SMALL_CELL_WIDTH 50  // Width of each cell
 #define SMALL_CELL_HEIGHT 35 // Height of each cell
 #define SMALL_FINAL_POS 124
+#define SMALL_ROWS 25
+#define SMALL_COLS 5
 
 // Ladder positions on the grid
 int small_ladders[3][2] = {{24, 33}, {62, 73}, {97, 106}};
@@ -114,16 +116,11 @@ void place_small_imgs(SDL_Renderer *renderer, int screen_x, int screen_y)
  * \param renderer - a pointer to the renderer
  * \param font - a pointer to the font
  */
-
 void small_grid(SDL_Renderer *renderer, TTF_Font *font)
 {
-    int margin = 25;
-    int rows = 25;
-    int cols = 5;
-
     // Calculate board dimensions
-    int width = (cols * SMALL_CELL_WIDTH);
-    int height = (rows * SMALL_CELL_HEIGHT);
+    int width = (SMALL_COLS * SMALL_CELL_WIDTH);
+    int height = (SMALL_ROWS * SMALL_CELL_HEIGHT);
 
     // Calculate board position
     int screen_x = (SCREEN_WIDTH - width) / 2;
@@ -151,14 +148,14 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
     int number = 1;                         // start value
     char num_str[10];
 
-    // Loops over the rows in the outer loop and columns in the inner loop
-    for (int row = rows - 1; (row <= rows) && (row >= 0); row--)
+    // Loops over the SMALL_ROWS in the outer loop and columns in the inner loop
+    for (int row = SMALL_ROWS - 1; (row <= SMALL_ROWS) && (row >= 0); row--)
     {
         // Checks if row is even
         if ((row % 2) == 0)
         {
-            // Increments positions in columns for even rows
-            for (int col = 0; col < cols; col++)
+            // Increments positions in columns for even SMALL_ROWS
+            for (int col = 0; col < SMALL_COLS; col++)
             {
                 // Prints the number on the grid
                 snprintf(num_str, sizeof(num_str), "%d", number++);
@@ -195,7 +192,7 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
         }
         else
         {
-            for (int col = cols - 1; (col <= cols) && (col >= 0); col--) // for columns going right to left , decrement
+            for (int col = SMALL_COLS - 1; (col <= SMALL_COLS) && (col >= 0); col--) // for columns going right to left , decrement
             {
                 snprintf(num_str, sizeof(num_str), "%d", number++); // print value in cell
 
@@ -227,7 +224,7 @@ void small_grid(SDL_Renderer *renderer, TTF_Font *font)
                 SDL_FreeSurface(textSurface);
                 SDL_DestroyTexture(textTexture);
             } // column loop
-        } // cond check for odd/even rows
+        } // cond check for odd/even SMALL_ROWS
     } // row loop
 
     // call to function that places all snakes and ladders on grid (hard coded)
@@ -340,7 +337,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
                     if (players[cur_p]->cur_position >= SMALL_FINAL_POS)
                     {
                         small_grid(renderer, font);
-                        move_player(renderer, SMALL_FINAL_POS, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
+                        move_player(renderer, SMALL_FINAL_POS, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, SMALL_ROWS, SMALL_COLS);
                         players[cur_p]->state = win;
                         game_done = true;
                         SDL_Delay(250);
@@ -352,10 +349,10 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 
                     for (int i = 0; i < num_players; i++)
                     {
-                        move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
+                        move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, SMALL_ROWS, SMALL_COLS);
                     } // Render all players in their positions
 
-                    move_player(renderer, players[cur_p]->cur_position, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT); // Draw the player at the new position
+                    move_player(renderer, players[cur_p]->cur_position, players[cur_p]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, SMALL_ROWS, SMALL_COLS); // Draw the player at the new position
 
                     SDL_Delay(250); // 200 ms delay for smooth movement
                     SDL_RenderPresent(renderer);
@@ -379,7 +376,7 @@ void small_grid_game(SDL_Renderer *renderer, TTF_Font *font, int num_players)
 
             for (int i = 0; i < num_players; i++) // Render all players in their positions
             {
-                move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT);
+                move_player(renderer, players[i]->cur_position, players[i]->player_texture, SCREEN_WIDTH, SCREEN_HEIGHT, SMALL_CELL_WIDTH, SMALL_CELL_HEIGHT, SMALL_ROWS, SMALL_COLS);
             }
 
             SDL_RenderPresent(renderer);

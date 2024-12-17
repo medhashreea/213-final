@@ -275,7 +275,7 @@ int main(int argc, char **argv)
                 else if (SDL_PointInRect(&mousePos, &large_board.rect))
                 {
                     SDL_SetWindowTitle(window, "Large Game");       // change window name
-                    large_grid_game(renderer, font, num_players);   // Call large game
+                    large_grid_game(renderer, num_players);   // Call large game
                     SDL_SetWindowTitle(window, "Snakes & Ladders"); // change window name back
                 } // mouse click in Large Game
             } // check if any of the grid buttons were pressed

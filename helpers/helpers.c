@@ -123,11 +123,9 @@ bool snake_or_ladder(int current_pos, int ladders[][2], int num_ladders, int sna
  * \param player_texture - a pointer to the player_texture
  */
 
-void move_player(SDL_Renderer *renderer, int current_pos, SDL_Texture *player_texture, int SCREEN_WIDTH, int SCREEN_HEIGHT, int CELL_WIDTH, int CELL_HEIGHT)
+void move_player(SDL_Renderer *renderer, int current_pos, SDL_Texture *player_texture, int SCREEN_WIDTH, int SCREEN_HEIGHT, int CELL_WIDTH, int CELL_HEIGHT, int rows, int cols)
 {
     // Board dimensions
-    int rows = 25;
-    int cols = 5;
     int cell_width = CELL_WIDTH;
     int cell_height = CELL_HEIGHT;
 
