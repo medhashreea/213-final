@@ -1,9 +1,7 @@
 # 213-final
 =====
-// Compile: clang helpers/helpers.c -o window window.c `sdl2-config --cflags --libs` -lSDL2_ttf -lSDL2_image -lm
 
-
-Last Updated: Thursday, December 05, 2024
+Last Updated: Tuesday, December 17, 2024
 
 Group:
     
@@ -13,7 +11,9 @@ Group:
 
 Description:
     
-    This is a game of Snakes & Ladders.
+    This is a game of Snakes & Ladders (aka Chutes & Ladders). The screen will open to the homepage where the user will be able to input a value for the number of players (1-4) and choose the version of Snakes & Ladders they want to play. If the user does not input any value for the number of players, the program will default to one character. When the character lands on the bottom of a ladder, it will move up. If the character lands on the top of a snake, it will slide down. The game is over when one character lands on the final cell.
+
+    This game involves the following topics: scheduling, files & file systems, and thread synchronization. Scheduling is used to keep track of the game's state (die, move, and win). Files and file systems is used to connect different parts of the program. Thread synchronization is not iintegrated yet, however, it would be used keep track of the different players adn their positions.
 
 Acknowledgements:
     
@@ -29,6 +29,6 @@ Acknowledgements:
         
         https://www.youtube.com/watch?v=zlKdOIQCnxA
 
-        ChatGPT
+        Scheduler code is inspired by code from Lab: Worm which Alyssa Trapp worked on with Lydia Ye
 
-        Scheduler code is inspired by code from Lab: Worm which I worked on with Lydia Ye
+        ChatGPT
