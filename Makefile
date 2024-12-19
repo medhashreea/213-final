@@ -12,3 +12,8 @@ window: window.c helpers/helpers.c
 	@echo Compiling $@
 	$(CC) $(CFLAGS) $^ -o $@
 	@echo "Build complete: $@"
+
+zip:
+	@echo "Generating window.zip file to submit to Gradescope..."
+	@zip -q -r window.zip . -x .git/\* .vscode/\* .clang-format .gitignore window
+	@echo "Done. Please upload window.zip to Gradescope."
